@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,6 +8,10 @@ function samplePngPath(): string {
   const target = path.join(os.tmpdir(), 'sample.png');
   fs.writeFileSync(target, Buffer.from(fs.readFileSync(source, 'utf8').trim(), 'base64'));
   return target;
+}
+
+async function waitForToolReady(page: Page): Promise<void> {
+  await expect(page.locator('[data-tool-ready="true"]').first()).toBeVisible();
 }
 
 test('search filters tools from the static index', async ({ page }) => {
@@ -20,6 +24,7 @@ test('search exposes discovery filters tags and shortcuts', async ({ page }) => 
   await page.goto('/search/');
   await expect(page.getByRole('heading', { name: 'Popular tools' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Recently added' })).toBeVisible();
+  await expect(page.locator('[data-search-ready="true"]')).toBeVisible();
 
   await page.keyboard.press('/');
   await expect(page.getByRole('searchbox')).toBeFocused();
@@ -68,10 +73,12 @@ test('reflection quiz records answers and shows result', async ({ page }) => {
 
 test('hash and unit tools render specialized outputs', async ({ page }) => {
   await page.goto('/tools/sha256-generator/');
+  await waitForToolReady(page);
   await page.getByLabel('Input').fill('abc');
   await expect(page.getByLabel('Output')).toContainText('ba7816bf');
 
   await page.goto('/tools/temperature-converter/');
+  await waitForToolReady(page);
   await page.getByLabel('Value').fill('100');
   await expect(page.getByLabel('Output')).toContainText('212');
 });
@@ -121,6 +128,7 @@ test('image tools process uploaded fixtures and expose output controls', async (
 
 test('SEO generators expose dedicated fields and outputs', async ({ page }) => {
   await page.goto('/tools/utm-builder/');
+  await waitForToolReady(page);
   await page.getByLabel('Campaign source').fill('organic');
   await page.getByLabel('Campaign medium').fill('social');
   await page.getByLabel('Campaign name').fill('spring launch');
@@ -129,20 +137,24 @@ test('SEO generators expose dedicated fields and outputs', async ({ page }) => {
   await expect(page.getByLabel('Output')).toContainText('utm_campaign=spring+launch');
 
   await page.goto('/tools/hreflang-tag-generator/');
+  await waitForToolReady(page);
   await page.getByLabel('Hreflang rows').fill('en|https://example.com/\nfr|https://example.com/fr/');
   await expect(page.getByLabel('Output')).toContainText('hreflang="fr"');
 
   await page.goto('/tools/robots-txt-generator/');
+  await waitForToolReady(page);
   await page.getByLabel('Disallow paths').fill('/admin/\n/private/');
   await expect(page.getByLabel('Output')).toContainText('Disallow: /admin/');
   await expect(page.getByLabel('Output')).toContainText('Disallow: /private/');
 
   await page.goto('/tools/faq-schema-generator/');
+  await waitForToolReady(page);
   await page.getByLabel('FAQ rows').fill('Is it local?|Whenever possible.');
   await expect(page.getByLabel('Output')).toContainText('FAQPage');
   await expect(page.getByLabel('Output')).toContainText('Is it local?');
 
   await page.goto('/tools/breadcrumb-schema-generator/');
+  await waitForToolReady(page);
   await page.getByLabel('Breadcrumb rows').fill('Home|https://example.com/\nTools|https://example.com/tools/');
   await expect(page.getByLabel('Output')).toContainText('BreadcrumbList');
   await expect(page.getByLabel('Output')).toContainText('"position": 2');
@@ -150,22 +162,26 @@ test('SEO generators expose dedicated fields and outputs', async ({ page }) => {
 
 test('calculator tools expose dedicated numeric fields and readable outputs', async ({ page }) => {
   await page.goto('/tools/percentage-calculator/');
+  await waitForToolReady(page);
   await page.getByLabel('Value').fill('30');
   await page.getByLabel('Total').fill('120');
   await expect(page.getByLabel('Output')).toContainText('25%');
 
   await page.goto('/tools/percentage-change-calculator/');
+  await waitForToolReady(page);
   await page.getByLabel('Previous value').fill('80');
   await page.getByLabel('Current value').fill('100');
   await expect(page.getByLabel('Output')).toContainText('+25%');
 
   await page.goto('/tools/discount-calculator/');
+  await waitForToolReady(page);
   await page.getByLabel('Original price').fill('80');
   await page.getByLabel('Discount percent').fill('25');
   await expect(page.getByLabel('Output')).toContainText('Final price: 60.00');
   await expect(page.getByLabel('Output')).toContainText('You save: 20.00');
 
   await page.goto('/tools/loan-payment-calculator/');
+  await waitForToolReady(page);
   await page.getByLabel('Principal').fill('12000');
   await page.getByLabel('Annual rate').fill('0');
   await page.getByLabel('Years').fill('1');
@@ -173,6 +189,7 @@ test('calculator tools expose dedicated numeric fields and readable outputs', as
   await expect(page.getByLabel('Output')).toContainText('Payment per period: 1000.00');
 
   await page.goto('/tools/compound-interest-calculator/');
+  await waitForToolReady(page);
   await page.getByLabel('Principal').fill('1000');
   await page.getByLabel('Annual rate').fill('5');
   await page.getByLabel('Years').fill('10');
@@ -182,6 +199,7 @@ test('calculator tools expose dedicated numeric fields and readable outputs', as
 
 test('developer tools expose dedicated regex cron and base fields', async ({ page }) => {
   await page.goto('/tools/regex-tester/');
+  await waitForToolReady(page);
   await page.getByLabel('Pattern').fill('(?<key>\\w+)=(\\d+)');
   await page.getByLabel('Flags').fill('g');
   await page.getByLabel('Test text').fill('a=1 b=22');
@@ -189,11 +207,13 @@ test('developer tools expose dedicated regex cron and base fields', async ({ pag
   await expect(page.getByLabel('Output')).toContainText('"key": "b"');
 
   await page.goto('/tools/cron-expression-explainer/');
+  await waitForToolReady(page);
   await page.getByLabel('Cron expression').fill('*/15 9-17 1,15 * 1-5');
   await expect(page.getByLabel('Output')).toContainText('every 15 minutes');
   await expect(page.getByLabel('Output')).toContainText('from hour 9 through 17');
 
   await page.goto('/tools/number-base-converter/');
+  await waitForToolReady(page);
   await page.getByLabel('Value').fill('1010');
   await page.getByLabel('From base').fill('2');
   await page.getByLabel('To base').fill('10');

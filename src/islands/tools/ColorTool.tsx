@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { contrastRatio, hexToRgb, hslToRgb, rgbToHex, rgbToHsl } from '@/lib/tools/color';
-import { OutputBox, ToolPanel } from './shared';
+import { Field, OutputBox, ToolPanel } from './shared';
 
 export type ColorMode = 'hex-to-rgb' | 'rgb-to-hex' | 'rgb-to-hsl' | 'hsl-to-rgb' | 'contrast-ratio' | 'generic';
 
@@ -22,7 +22,7 @@ export default function ColorTool({ component, title }: { component: string; tit
       return input;
     } catch (error) { return error instanceof Error ? error.message : 'Invalid color input.'; }
   }, [input, mode]);
-  return <ToolPanel title={title}><label style={{ display: 'block', marginBottom: '.75rem' }}>Color input<input className="input ltr-only" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /></ToolPanel>;
+  return <ToolPanel title={title}><Field label="Color input"><input className="input ltr-only" value={input} onChange={(event) => setInput(event.target.value)} /></Field><OutputBox value={output} /></ToolPanel>;
 }
 
 function parseRgb(input: string) { const [r, g, b] = input.split(',').map((part) => Number(part.trim())); return { r, g, b }; }

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 
 export function CopyActions({ output, onClear }: { output: string; onClear: () => void }) {
   return (
@@ -22,6 +22,20 @@ export function PrivacyNote({ children }: { children: ReactNode }) {
   return <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{children}</p>;
 }
 
+export function Field({ label, children }: { label: string; children: ReactNode }) {
+  return <label style={{ display: 'block', marginBottom: '.75rem' }}>{label}{children}</label>;
+}
+
+export function FieldGrid({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+  return <div className="grid-auto" style={style}>{children}</div>;
+}
+
 export function ToolPanel({ title, privacyNote, children }: { title: string; privacyNote?: string; children: ReactNode }) {
-  return <section className="card" style={{ padding: '1.25rem' }}><h2 style={{ marginTop: 0 }}>{title}</h2>{privacyNote && <PrivacyNote>{privacyNote}</PrivacyNote>}{children}</section>;
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  return <section className="card" data-tool-ready={isHydrated ? 'true' : 'false'} style={{ padding: '1.25rem' }}><h2 style={{ marginTop: 0 }}>{title}</h2>{privacyNote && <PrivacyNote>{privacyNote}</PrivacyNote>}{children}</section>;
 }

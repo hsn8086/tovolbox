@@ -4,7 +4,7 @@ import { hashText } from '@/lib/tools/hash';
 import { decodeHtmlEntities, encodeHtmlEntities } from '@/lib/tools/htmlEntity';
 import { generateUlid, generateUuidV4 } from '@/lib/tools/ids';
 import { generatePassword, generateRandomString } from '@/lib/tools/random';
-import { CopyActions, OutputBox, ToolPanel } from './shared';
+import { CopyActions, Field, OutputBox, ToolPanel } from './shared';
 
 export function getEncodeCryptoMode(component: string): string {
   if (component.startsWith('hash-')) return component;
@@ -40,5 +40,5 @@ export default function EncodeCryptoTool({ component, title, privacyNote }: { co
       return input;
     } catch (error) { return error instanceof Error ? error.message : 'Unable to process input.'; }
   }, [asyncOutput, input, mode, operation]);
-  return <ToolPanel title={title} privacyNote={privacyNote}>{['base64', 'url-codec', 'html-entity'].includes(mode) && <label style={{ display: 'block', marginBottom: '.75rem' }}>Mode<select className="select" value={operation} onChange={(event) => setOperation(event.target.value)}><option value="encode">Encode</option><option value="decode">Decode</option></select></label>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}>{['base64', 'url-codec', 'html-entity'].includes(mode) && <Field label="Mode"><select className="select" value={operation} onChange={(event) => setOperation(event.target.value)}><option value="encode">Encode</option><option value="decode">Decode</option></select></Field>}<Field label="Input"><textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></Field><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }

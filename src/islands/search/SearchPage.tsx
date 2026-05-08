@@ -17,6 +17,7 @@ export default function SearchPage({ locale, initialItems = [] }: Props) {
   const [categorySlug, setCategorySlug] = useState('');
   const [activeTag, setActiveTag] = useState('');
   const [loadState, setLoadState] = useState<LoadState>(hasInitialItems ? 'ready' : 'idle');
+  const [isHydrated, setIsHydrated] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -44,6 +45,8 @@ export default function SearchPage({ locale, initialItems = [] }: Props) {
   }, [hasInitialItems, locale]);
 
   useEffect(() => {
+    setIsHydrated(true);
+
     function handleShortcut(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       const isEditable = target?.matches('input, textarea, select, [contenteditable="true"]') ?? false;
@@ -75,7 +78,7 @@ export default function SearchPage({ locale, initialItems = [] }: Props) {
   }
 
   return (
-    <section className="card" style={{ minHeight: '24rem', padding: '1.25rem' }}>
+    <section className="card" data-search-ready={isHydrated ? 'true' : 'false'} style={{ minHeight: '24rem', padding: '1.25rem' }}>
       <label style={{ display: 'block', marginBottom: '1rem' }}>
         {copy.label} <span style={{ color: 'var(--muted)', fontWeight: 500 }}>({copy.shortcutHint})</span>
         <input

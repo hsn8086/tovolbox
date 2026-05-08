@@ -1,8 +1,8 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { buildUtmUrl, titleAdvice } from '@/lib/tools/seo';
 import { analyzeMetaDescription, buildOpenGraphTags, buildSerpPreview, buildTwitterCardTags } from '@/lib/tools/seoPreview';
 import { generateBreadcrumbSchema, generateCanonicalTag, generateFaqSchema, generateHreflangTags, generateRobotsTxt, type BreadcrumbItem, type FaqItem, type HreflangLink } from '@/lib/tools/schemaGenerators';
-import { CopyActions, OutputBox, ToolPanel } from './shared';
+import { CopyActions, Field, OutputBox, ToolPanel } from './shared';
 
 const modes = ['meta-title-checker', 'meta-description-checker', 'serp-preview', 'open-graph-preview', 'twitter-card-preview', 'canonical-tag-generator', 'hreflang-tag-generator', 'robots-txt-generator', 'faq-schema-generator', 'breadcrumb-schema-generator', 'utm-builder'] as const;
 export function getSeoMode(component: string): string { return modes.includes(component as never) ? component : 'generic'; }
@@ -127,8 +127,4 @@ export default function SeoTool({ component, title }: { component: string; title
       <CopyActions output={output} onClear={clearCurrentInput} />
     </ToolPanel>
   );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label style={{ display: 'block', marginBottom: '.75rem' }}>{label}{children}</label>;
 }

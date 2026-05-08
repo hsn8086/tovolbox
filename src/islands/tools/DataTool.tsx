@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { formatJson, minifyJson } from '@/lib/tools/json';
 import { csvToJson, jsonToCsv } from '@/lib/tools/jsonCsv';
 import { buildQueryString, parseQueryString } from '@/lib/tools/queryString';
-import { CopyActions, OutputBox, ToolPanel } from './shared';
+import { CopyActions, Field, OutputBox, ToolPanel } from './shared';
 
 export type DataMode = 'json-formatter' | 'json-minifier' | 'json-to-csv' | 'csv-to-json' | 'query-string-parser' | 'query-string-builder' | 'generic';
 
@@ -34,7 +34,7 @@ export default function DataTool({ component, title, privacyNote }: { component:
     }
   }, [input, mode]);
 
-  return <ToolPanel title={title} privacyNote={privacyNote}><label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}><Field label="Input"><textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></Field><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }
 
 function sample(mode: DataMode): string {

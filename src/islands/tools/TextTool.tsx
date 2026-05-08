@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { extractHeadings, generateMarkdownToc, markdownToPlainText } from '@/lib/tools/markdown';
 import { countWords, slugify, toCamelCase, toTitleCase } from '@/lib/tools/text';
 import { deduplicateLines, extractEmails, extractNumbers, extractUrls, findAndReplace, removeEmptyLines, sortLines, trimLines } from '@/lib/tools/textExtract';
-import { CopyActions, OutputBox, ToolPanel } from './shared';
+import { CopyActions, Field, FieldGrid, OutputBox, ToolPanel } from './shared';
 
 const modes = ['word-counter', 'case-converter', 'slug-generator', 'extract-emails', 'extract-urls', 'extract-numbers', 'remove-empty-lines', 'deduplicate-lines', 'sort-lines', 'trim-lines', 'find-replace', 'markdown-toc'] as const;
 export type TextMode = (typeof modes)[number] | 'generic';
@@ -31,5 +31,5 @@ export default function TextTool({ component, title, privacyNote }: { component:
     if (mode === 'markdown-toc') return [generateMarkdownToc(input), markdownToPlainText(input), JSON.stringify(extractHeadings(input), null, 2)].join('\n\n');
     return input;
   }, [find, input, mode, replaceWith]);
-  return <ToolPanel title={title} privacyNote={privacyNote}>{mode === 'find-replace' && <div className="grid-auto" style={{ marginBottom: '.75rem' }}><label>Find<input className="input" value={find} onChange={(event) => setFind(event.target.value)} /></label><label>Replace<input className="input" value={replaceWith} onChange={(event) => setReplaceWith(event.target.value)} /></label></div>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}>{mode === 'find-replace' && <FieldGrid style={{ marginBottom: '.75rem' }}><label>Find<input className="input" value={find} onChange={(event) => setFind(event.target.value)} /></label><label>Replace<input className="input" value={replaceWith} onChange={(event) => setReplaceWith(event.target.value)} /></label></FieldGrid>}<Field label="Input"><textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></Field><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }

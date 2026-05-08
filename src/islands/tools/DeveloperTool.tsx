@@ -1,10 +1,10 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import { compoundInterest, convertNumberBase, discountPrice, loanPayment, percentageChange, percentageOf } from '@/lib/tools/calculators';
 import { explainCron } from '@/lib/tools/cron';
 import { estimateBase64Size, humanFileSummary } from '@/lib/tools/fileTools';
 import { buildMailtoPayload, buildVCardPayload, buildWifiQrPayload, validateEan13 } from '@/lib/tools/qr';
 import { testRegex } from '@/lib/tools/regex';
-import { CopyActions, OutputBox, ToolPanel } from './shared';
+import { CopyActions, Field, FieldGrid, OutputBox, ToolPanel } from './shared';
 
 const modes = ['regex-tester', 'cron-explainer', 'percentage-calculator', 'percentage-change', 'discount-calculator', 'loan-calculator', 'compound-interest', 'number-base-converter', 'wifi-qr-payload', 'vcard-payload', 'mailto-builder', 'ean13-validator', 'file-summary', 'base64-size-estimator'] as const;
 export function getDeveloperMode(component: string): string { return modes.includes(component as never) ? component : 'generic'; }
@@ -57,49 +57,49 @@ export default function DeveloperTool({ component, title }: { component: string;
     <ToolPanel title={title}>
       {mode === 'regex-tester' ? (
         <>
-          <div className="grid-auto">
+          <FieldGrid>
             <Field label="Pattern"><input className="input ltr-only" value={regex.pattern} onChange={(event) => setRegex((current) => ({ ...current, pattern: event.target.value }))} /></Field>
             <Field label="Flags"><input className="input ltr-only" value={regex.flags} onChange={(event) => setRegex((current) => ({ ...current, flags: event.target.value }))} /></Field>
-          </div>
+          </FieldGrid>
           <Field label="Test text"><textarea className="textarea" value={regex.text} onChange={(event) => setRegex((current) => ({ ...current, text: event.target.value }))} /></Field>
         </>
       ) : mode === 'cron-explainer' ? (
         <Field label="Cron expression"><input className="input ltr-only" value={cron} onChange={(event) => setCron(event.target.value)} /></Field>
       ) : mode === 'number-base-converter' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Value"><input className="input ltr-only" value={base.value} onChange={(event) => setBase((current) => ({ ...current, value: event.target.value }))} /></Field>
           <Field label="From base"><input className="input" value={base.from} onChange={(event) => setBase((current) => ({ ...current, from: event.target.value }))} /></Field>
           <Field label="To base"><input className="input" value={base.to} onChange={(event) => setBase((current) => ({ ...current, to: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : mode === 'percentage-calculator' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Value"><input className="input" value={percentage.value} onChange={(event) => setPercentage((current) => ({ ...current, value: event.target.value }))} /></Field>
           <Field label="Total"><input className="input" value={percentage.total} onChange={(event) => setPercentage((current) => ({ ...current, total: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : mode === 'percentage-change' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Previous value"><input className="input" value={percentageChangeInput.previous} onChange={(event) => setPercentageChangeInput((current) => ({ ...current, previous: event.target.value }))} /></Field>
           <Field label="Current value"><input className="input" value={percentageChangeInput.current} onChange={(event) => setPercentageChangeInput((current) => ({ ...current, current: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : mode === 'discount-calculator' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Original price"><input className="input" value={discount.price} onChange={(event) => setDiscount((current) => ({ ...current, price: event.target.value }))} /></Field>
           <Field label="Discount percent"><input className="input" value={discount.percent} onChange={(event) => setDiscount((current) => ({ ...current, percent: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : mode === 'loan-calculator' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Principal"><input className="input" value={loan.principal} onChange={(event) => setLoan((current) => ({ ...current, principal: event.target.value }))} /></Field>
           <Field label="Annual rate"><input className="input" value={loan.annualRate} onChange={(event) => setLoan((current) => ({ ...current, annualRate: event.target.value }))} /></Field>
           <Field label="Years"><input className="input" value={loan.years} onChange={(event) => setLoan((current) => ({ ...current, years: event.target.value }))} /></Field>
           <Field label="Payments per year"><input className="input" value={loan.paymentsPerYear} onChange={(event) => setLoan((current) => ({ ...current, paymentsPerYear: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : mode === 'compound-interest' ? (
-        <div className="grid-auto">
+        <FieldGrid>
           <Field label="Principal"><input className="input" value={compound.principal} onChange={(event) => setCompound((current) => ({ ...current, principal: event.target.value }))} /></Field>
           <Field label="Annual rate"><input className="input" value={compound.annualRate} onChange={(event) => setCompound((current) => ({ ...current, annualRate: event.target.value }))} /></Field>
           <Field label="Years"><input className="input" value={compound.years} onChange={(event) => setCompound((current) => ({ ...current, years: event.target.value }))} /></Field>
           <Field label="Compounds per year"><input className="input" value={compound.compoundsPerYear} onChange={(event) => setCompound((current) => ({ ...current, compoundsPerYear: event.target.value }))} /></Field>
-        </div>
+        </FieldGrid>
       ) : (
         <Field label="Input"><textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></Field>
       )}
@@ -170,8 +170,4 @@ function formatMoney(value: number): string {
 
 function formatNumber(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(6).replace(/\.?0+$/, '');
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label style={{ display: 'block', marginBottom: '.75rem' }}>{label}{children}</label>;
 }

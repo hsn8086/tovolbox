@@ -26,6 +26,7 @@ import { formatSvg, minifySvg, sanitizeSvgForPreview, svgToDataUri, svgToJsx } f
 import { countWords, slugify, toCamelCase, toTitleCase } from '@/lib/tools/text';
 import { deduplicateLines, extractEmails, extractNumbers, extractUrls, findAndReplace, removeEmptyLines, sortLines, trimLines } from '@/lib/tools/textExtract';
 import { convertDataSize, convertLength, convertTemperature, convertWeight } from '@/lib/tools/units';
+import { CopyActions, Field, OutputBox, ToolPanel } from './shared';
 
 type Props = {
   component: string;
@@ -160,38 +161,27 @@ export default function GenericTool({ component, title, privacyNote }: Props & {
   }
 
   return (
-    <section className="card" style={{ padding: '1.25rem' }}>
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
-      <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{privacyNote}</p>
+    <ToolPanel title={title} privacyNote={privacyNote}>
       {(component === 'base64' || component === 'url-codec' || component === 'html-entity') && (
-        <label style={{ display: 'block', marginBottom: '.75rem' }}>
-          Mode
+        <Field label="Mode">
           <select className="select" value={mode} onChange={(event) => setMode(event.target.value)}>
             <option value="encode">Encode</option>
             <option value="decode">Decode</option>
           </select>
-        </label>
+        </Field>
       )}
       {component.startsWith('image-') ? (
-        <label style={{ display: 'block', marginBottom: '.75rem' }}>
-          Image file
+        <Field label="Image file">
           <input className="input" type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && void handleFile(event.target.files[0])} />
-        </label>
+        </Field>
       ) : (
-        <label style={{ display: 'block', marginBottom: '.75rem' }}>
-          Input
+        <Field label="Input">
           <textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} placeholder="Paste input here" />
-        </label>
+        </Field>
       )}
-      <label style={{ display: 'block' }}>
-        Output
-        <textarea className="textarea ltr-only" readOnly value={output} />
-      </label>
-      <div style={{ display: 'flex', gap: '.75rem', marginTop: '.9rem', flexWrap: 'wrap' }}>
-        <button className="btn" type="button" onClick={() => void navigator.clipboard.writeText(output)}>Copy result</button>
-        <button className="btn btn-secondary" type="button" onClick={() => setInput('')}>Clear</button>
-      </div>
-    </section>
+      <OutputBox value={output} />
+      <CopyActions output={output} onClear={() => setInput('')} />
+    </ToolPanel>
   );
 }
 

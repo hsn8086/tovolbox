@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { convertDataSize, convertLength, convertTemperature, convertWeight } from '@/lib/tools/units';
-import { OutputBox, ToolPanel } from './shared';
+import { FieldGrid, OutputBox, ToolPanel } from './shared';
 
 export type UnitMode = 'length' | 'weight' | 'temperature' | 'data-size' | 'generic';
 
@@ -34,5 +34,5 @@ export default function UnitConverterTool({ component, title }: { component: str
     } catch (error) { return error instanceof Error ? error.message : 'Unable to convert.'; }
   }, [from, mode, to, value]);
 
-  return <ToolPanel title={title}><div className="grid-auto"><label>Value<input className="input" value={value} onChange={(event) => setValue(event.target.value)} /></label><label>From<select className="select" value={from} onChange={(event) => setFrom(event.target.value)}>{units[mode].map((unit) => <option key={unit}>{unit}</option>)}</select></label><label>To<select className="select" value={to} onChange={(event) => setTo(event.target.value)}>{units[mode].map((unit) => <option key={unit}>{unit}</option>)}</select></label></div><OutputBox value={output} /></ToolPanel>;
+  return <ToolPanel title={title}><FieldGrid><label>Value<input className="input" value={value} onChange={(event) => setValue(event.target.value)} /></label><label>From<select className="select" value={from} onChange={(event) => setFrom(event.target.value)}>{units[mode].map((unit) => <option key={unit}>{unit}</option>)}</select></label><label>To<select className="select" value={to} onChange={(event) => setTo(event.target.value)}>{units[mode].map((unit) => <option key={unit}>{unit}</option>)}</select></label></FieldGrid><OutputBox value={output} /></ToolPanel>;
 }
