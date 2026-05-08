@@ -16,6 +16,32 @@ test('search filters tools from the static index', async ({ page }) => {
   await expect(page.getByRole('link', { name: /SHA-256 Generator/i })).toBeVisible();
 });
 
+test('search exposes discovery filters tags and shortcuts', async ({ page }) => {
+  await page.goto('/search/');
+  await expect(page.getByRole('heading', { name: 'Popular tools' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Recently added' })).toBeVisible();
+
+  await page.keyboard.press('/');
+  await expect(page.getByRole('searchbox')).toBeFocused();
+
+  await page.getByLabel('Category').selectOption('image-tools');
+  await expect(page.getByRole('link', { name: /Image Resize Calculator/i })).toBeVisible();
+
+  await page.getByRole('button', { name: /Clear filters/i }).click();
+  await page.getByRole('button', { name: /^json /i }).click();
+  await expect(page.getByRole('link', { name: /JSON Formatter/i })).toBeVisible();
+
+  await page.getByRole('searchbox').fill('definitely-no-tool');
+  await expect(page.getByText(/No matching tools found/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Recommended tools' })).toBeVisible();
+});
+
+test('localized search matches Chinese content', async ({ page }) => {
+  await page.goto('/zh-CN/search/');
+  await page.getByRole('searchbox').fill('压力');
+  await expect(page.getByRole('link', { name: /压力水平自查/i })).toBeVisible();
+});
+
 test('reflection quiz records answers and shows result', async ({ page }) => {
   await page.goto('/tools/big-five-lite-reflection/');
   await expect(page.locator('aside').filter({ hasText: /personal insight/i })).toBeVisible();
