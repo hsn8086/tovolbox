@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { getSearchCopy } from '@/data/pageCopy';
 import { filterSearchItems, getCategoryFacets, getPopularItems, getRecentItems, getTagFacets, type SearchItem } from '@/lib/search/filter';
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
 export default function SearchPage({ locale }: Props) {
+  const copy = getSearchCopy(locale);
   const [items, setItems] = useState<SearchItem[]>([]);
   const [query, setQuery] = useState('');
   const [categorySlug, setCategorySlug] = useState('');
@@ -70,14 +72,14 @@ export default function SearchPage({ locale }: Props) {
   return (
     <section className="card" style={{ padding: '1.25rem' }}>
       <label style={{ display: 'block', marginBottom: '1rem' }}>
-        Search tools <span style={{ color: 'var(--muted)', fontWeight: 500 }}>(press /)</span>
+        {copy.label} <span style={{ color: 'var(--muted)', fontWeight: 500 }}>({copy.shortcutHint})</span>
         <input
           ref={searchInputRef}
           className="input"
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by title, keyword, tag, or description"
+          placeholder={copy.placeholder}
           aria-describedby="search-result-summary"
         />
       </label>
@@ -85,14 +87,14 @@ export default function SearchPage({ locale }: Props) {
       {loadState === 'ready' && (
         <div style={{ display: 'grid', gap: '1rem', marginBottom: '1rem' }}>
           <label style={{ display: 'grid', gap: '.45rem', fontWeight: 800 }}>
-            Category
+            {copy.categoryLabel}
             <select className="input" value={categorySlug} onChange={(event) => setCategorySlug(event.target.value)}>
-              <option value="">All categories</option>
+              <option value="">{copy.allCategories}</option>
               {categoryFacets.map((category) => <option key={category.slug} value={category.slug}>{category.title} ({category.count})</option>)}
             </select>
           </label>
 
-          <div aria-label="Popular tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
+          <div aria-label={copy.popularTagsLabel} style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
             {tagFacets.map(({ tag, count }) => (
               <button
                 key={tag}
@@ -107,27 +109,27 @@ export default function SearchPage({ locale }: Props) {
             ))}
           </div>
 
-          {hasActiveFilters && <button className="btn btn-secondary" type="button" onClick={clearFilters} style={{ justifySelf: 'start' }}>Clear filters</button>}
+          {hasActiveFilters && <button className="btn btn-secondary" type="button" onClick={clearFilters} style={{ justifySelf: 'start' }}>{copy.clearFilters}</button>}
         </div>
       )}
 
       <p id="search-result-summary" style={{ color: 'var(--muted)', margin: '0 0 1rem' }}>
-        {loadState === 'loading' && 'Loading search index...'}
-        {loadState === 'error' && 'Unable to load search results.'}
-        {loadState === 'ready' && `${resultCount} ${resultCount === 1 ? 'result' : 'results'}${hasQuery ? ` for "${query.trim()}"` : ''}${activeTag ? ` tagged "${activeTag}"` : ''}${categorySlug ? ' in the selected category' : ''}.`}
+        {loadState === 'loading' && copy.loading}
+        {loadState === 'error' && copy.error}
+        {loadState === 'ready' && copy.resultSummary(resultCount, hasQuery ? query.trim() : '', activeTag, Boolean(categorySlug))}
       </p>
 
       {showDiscovery && (
         <div style={{ display: 'grid', gap: '1rem', marginBottom: '1rem' }}>
-          <DiscoveryList title="Popular tools" items={popularItems} />
-          <DiscoveryList title="Recently added" items={recentItems} />
+          <DiscoveryList title={copy.popularTools} items={popularItems} />
+          <DiscoveryList title={copy.recentlyAdded} items={recentItems} />
         </div>
       )}
 
       {loadState === 'ready' && resultCount === 0 ? (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <p style={{ color: 'var(--muted)', margin: 0 }}>No matching tools found. Try a broader search or one of these popular tools.</p>
-          <DiscoveryList title="Recommended tools" items={suggestions} />
+          <p style={{ color: 'var(--muted)', margin: 0 }}>{copy.noResults}</p>
+          <DiscoveryList title={copy.recommendedTools} items={suggestions} />
         </div>
       ) : (
         <div className="grid-auto">
@@ -135,7 +137,7 @@ export default function SearchPage({ locale }: Props) {
             <a key={`${item.type ?? 'tool'}-${item.slug}`} className="card" href={item.url ?? `/tools/${item.slug}/`} style={{ display: 'block', padding: '1rem' }}>
               <h2 style={{ fontSize: '1.05rem', margin: '0 0 .35rem' }}>{item.title}</h2>
               <p style={{ color: 'var(--muted)', lineHeight: 1.55, margin: 0 }}>{item.description}</p>
-              <p style={{ color: 'var(--muted)', fontSize: '.85rem', margin: '.65rem 0 0' }}>{item.categoryTitle ?? (item.type === 'category' ? 'Category' : 'Tool')}</p>
+              <p style={{ color: 'var(--muted)', fontSize: '.85rem', margin: '.65rem 0 0' }}>{item.categoryTitle ?? (item.type === 'category' ? copy.categoryFallback : copy.toolFallback)}</p>
             </a>
           ))}
         </div>

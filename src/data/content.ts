@@ -9,6 +9,12 @@ type Seed = {
   keywords?: string[];
 };
 
+type ContentSeed = {
+  en: Seed;
+  'zh-CN': Seed;
+  'zh-TW': Seed;
+} & Partial<Record<Locale, Seed>>;
+
 const suffix: Record<Locale, { title: string; intro: string; how: string[]; useCases: string[]; faq: string[] }> = {
   en: {
     title: 'Free Online Tool',
@@ -33,17 +39,17 @@ const suffix: Record<Locale, { title: string; intro: string; how: string[]; useC
   },
   ja: {
     title: '無料オンラインツール',
-    intro: 'ブラウザー上で日常作業をすばやく安全に処理できます。',
-    how: ['入力を貼り付けます。', '必要に応じて設定します。', '結果を確認してコピーします。'],
-    useCases: ['開発作業', 'SEO確認', 'ブラウザー内処理'],
-    faq: ['無料ですか？', '入力は送信されますか？'],
+    intro: '日常の作業をすばやく進められるよう、速度、プライバシー、わかりやすい結果を重視しています。',
+    how: ['入力欄にテキストや値を入力します。', '必要に応じてオプションを調整します。', '結果を確認し、コピーまたはダウンロードします。'],
+    useCases: ['開発やデータ確認の定型作業', 'コンテンツとSEOの見直し', 'ブラウザー内で完結するプライベートな処理'],
+    faq: ['このツールは無料ですか？', '入力内容はブラウザーの外へ送信されますか？'],
   },
   ko: {
     title: '무료 온라인 도구',
-    intro: '브라우저에서 빠르고 개인적으로 일상 작업을 처리합니다.',
-    how: ['입력을 붙여넣습니다.', '옵션을 조정합니다.', '결과를 복사합니다.'],
-    useCases: ['개발 작업', 'SEO 확인', '로컬 처리'],
-    faq: ['무료인가요?', '입력이 전송되나요?'],
+    intro: '일상 작업을 빠르게 처리할 수 있도록 속도, 개인정보 보호, 이해하기 쉬운 결과에 초점을 맞췄습니다.',
+    how: ['입력란에 텍스트나 값을 입력합니다.', '필요한 경우 옵션을 조정합니다.', '결과를 확인한 뒤 복사하거나 다운로드합니다.'],
+    useCases: ['개발 및 데이터 확인 작업', '콘텐츠와 SEO 점검', '브라우저 안에서 끝나는 비공개 처리'],
+    faq: ['이 도구는 무료인가요?', '입력 내용이 브라우저 밖으로 전송되나요?'],
   },
   es: {
     title: 'Herramienta Online Gratis',
@@ -89,11 +95,11 @@ const suffix: Record<Locale, { title: string; intro: string; how: string[]; useC
   },
 };
 
-function content(seed: Record<'en' | 'zh-CN' | 'zh-TW', Seed>, keywords: string[] = []): Record<Locale, LocalizedContent> {
+function content(seed: ContentSeed, keywords: string[] = []): Record<Locale, LocalizedContent> {
   const result = {} as Record<Locale, LocalizedContent>;
 
   for (const locale of locales) {
-    const base = seed[locale as 'en' | 'zh-CN' | 'zh-TW'] ?? seed.en;
+    const base = seed[locale] ?? seed.en;
     const localizedSuffix = suffix[locale];
     const name = base.h1 ?? base.title;
     result[locale] = {
@@ -122,6 +128,8 @@ export const categories: Category[] = [
       en: { title: 'Developer Tools', description: 'Format, validate, encode, decode, and generate data for daily development workflows.' },
       'zh-CN': { title: '开发者工具', description: '用于日常开发的格式化、校验、编码、解码和生成工具。' },
       'zh-TW': { title: '開發者工具', description: '用於日常開發的格式化、驗證、編碼、解碼和產生工具。' },
+      ja: { title: '開発者ツール', description: '日々の開発で使う整形、検証、エンコード、デコード、データ生成ツール。' },
+      ko: { title: '개발자 도구', description: '일상 개발 작업에 필요한 포맷, 검증, 인코딩, 디코딩, 데이터 생성 도구입니다.' },
     }),
   },
   {
@@ -131,6 +139,8 @@ export const categories: Category[] = [
       en: { title: 'JSON and Data Tools', description: 'Work with JSON, query strings, CSV, YAML, and structured data directly in the browser.' },
       'zh-CN': { title: 'JSON 与数据工具', description: '在浏览器中处理 JSON、查询字符串、CSV、YAML 和结构化数据。' },
       'zh-TW': { title: 'JSON 與資料工具', description: '在瀏覽器中處理 JSON、查詢字串、CSV、YAML 和結構化資料。' },
+      ja: { title: 'JSON・データツール', description: 'JSON、クエリ文字列、CSV、YAML、構造化データをブラウザーで直接処理します。' },
+      ko: { title: 'JSON 및 데이터 도구', description: 'JSON, 쿼리 문자열, CSV, YAML, 구조화 데이터를 브라우저에서 바로 처리합니다.' },
     }),
   },
   {
@@ -140,6 +150,8 @@ export const categories: Category[] = [
       en: { title: 'Encoding and Decoding Tools', description: 'Encode and decode Base64, URLs, HTML entities, JWT payloads, and more.' },
       'zh-CN': { title: '编码与解码工具', description: '编码和解码 Base64、URL、HTML 实体、JWT 载荷等内容。' },
       'zh-TW': { title: '編碼與解碼工具', description: '編碼和解碼 Base64、URL、HTML 實體、JWT 載荷等內容。' },
+      ja: { title: 'エンコード・デコードツール', description: 'Base64、URL、HTMLエンティティ、JWTペイロードなどをエンコードまたはデコードします。' },
+      ko: { title: '인코딩 및 디코딩 도구', description: 'Base64, URL, HTML 엔티티, JWT 페이로드 등을 인코딩하고 디코딩합니다.' },
     }),
   },
   {
@@ -149,6 +161,8 @@ export const categories: Category[] = [
       en: { title: 'Text Tools', description: 'Count, clean, transform, sort, and extract information from text.' },
       'zh-CN': { title: '文本工具', description: '统计、清理、转换、排序并提取文本中的信息。' },
       'zh-TW': { title: '文字工具', description: '統計、清理、轉換、排序並擷取文字中的資訊。' },
+      ja: { title: 'テキストツール', description: 'テキストの文字数確認、整形、変換、並べ替え、情報抽出を行います。' },
+      ko: { title: '텍스트 도구', description: '텍스트를 계산, 정리, 변환, 정렬하고 필요한 정보를 추출합니다.' },
     }),
   },
   {
@@ -158,6 +172,8 @@ export const categories: Category[] = [
       en: { title: 'SEO Tools', description: 'Preview metadata, build UTM links, generate robots.txt, and improve technical SEO.' },
       'zh-CN': { title: 'SEO 工具', description: '预览元信息、生成 UTM 链接和 robots.txt，改进技术 SEO。' },
       'zh-TW': { title: 'SEO 工具', description: '預覽中繼資訊、產生 UTM 連結和 robots.txt，改善技術 SEO。' },
+      ja: { title: 'SEOツール', description: 'メタデータのプレビュー、UTMリンク作成、robots.txt生成など技術SEOを支援します。' },
+      ko: { title: 'SEO 도구', description: '메타데이터 미리보기, UTM 링크 생성, robots.txt 작성 등 기술 SEO를 개선합니다.' },
     }),
   },
   {
@@ -167,6 +183,8 @@ export const categories: Category[] = [
       en: { title: 'Image Tools', description: 'Inspect, resize, encode, and transform images locally in your browser.' },
       'zh-CN': { title: '图像工具', description: '在浏览器本地检查、调整、编码和转换图片。' },
       'zh-TW': { title: '圖像工具', description: '在瀏覽器本機檢查、調整、編碼和轉換圖片。' },
+      ja: { title: '画像ツール', description: '画像の確認、リサイズ、エンコード、変換をブラウザー内でローカルに行います。' },
+      ko: { title: '이미지 도구', description: '이미지를 브라우저 안에서 로컬로 확인, 크기 조정, 인코딩, 변환합니다.' },
     }),
   },
   {
@@ -176,6 +194,8 @@ export const categories: Category[] = [
       en: { title: 'Personality Tests', description: 'Self-reflection quizzes for personality, work style, stress, and wellbeing.' },
       'zh-CN': { title: '人格与自我了解测试', description: '用于性格、工作风格、压力和身心状态的自我反思测试。' },
       'zh-TW': { title: '人格與自我了解測驗', description: '用於性格、工作風格、壓力和身心狀態的自我反思測驗。' },
+      ja: { title: '自己理解クイズ', description: '性格、働き方、ストレス、ウェルビーイングを振り返る非臨床の自己理解クイズ。' },
+      ko: { title: '성격 및 자기 이해 테스트', description: '성격, 업무 방식, 스트레스, 웰빙을 돌아보는 비임상 자기 성찰 퀴즈입니다.' },
     }),
   },
   {
@@ -185,11 +205,13 @@ export const categories: Category[] = [
       en: { title: 'Clinical Assessment Guides', description: 'Educational guides about professional psychological assessments without online diagnosis.' },
       'zh-CN': { title: '专业测评介绍', description: '关于专业心理测评的知识介绍，不提供在线诊断。' },
       'zh-TW': { title: '專業測評介紹', description: '關於專業心理測評的知識介紹，不提供線上診斷。' },
+      ja: { title: '専門アセスメントガイド', description: '専門的な心理アセスメントを学ぶための教育ガイドです。オンライン診断は提供しません。' },
+      ko: { title: '전문 평가 가이드', description: '전문 심리 평가를 이해하기 위한 교육용 안내이며 온라인 진단을 제공하지 않습니다.' },
     }),
   },
 ];
 
-function tool(slug: string, categorySlug: string, kind: ToolKind, component: string | undefined, seed: Record<'en' | 'zh-CN' | 'zh-TW', Seed>, tags: string[]): Tool {
+function tool(slug: string, categorySlug: string, kind: ToolKind, component: string | undefined, seed: ContentSeed, tags: string[]): Tool {
   return {
     slug,
     kind,
@@ -210,191 +232,267 @@ export const tools: Tool[] = [
     en: { title: 'JSON Formatter', description: 'Format messy JSON into readable, indented JSON with validation feedback.' },
     'zh-CN': { title: 'JSON 格式化工具', description: '将混乱的 JSON 格式化为易读缩进结构，并提供校验反馈。' },
     'zh-TW': { title: 'JSON 格式化工具', description: '將混亂的 JSON 格式化為易讀縮排結構，並提供驗證回饋。' },
+    ja: { title: 'JSONフォーマッター', description: '読みづらいJSONを検証しながら、インデントされた見やすい形式に整えます。' },
+    ko: { title: 'JSON 포매터', description: '복잡한 JSON을 검증 피드백과 함께 읽기 쉬운 들여쓰기 형식으로 정리합니다.' },
   }, ['json', 'formatter', 'validator']),
   tool('json-minifier', 'json-data-tools', 'text-transform', 'json-minifier', {
     en: { title: 'JSON Minifier', description: 'Remove whitespace from JSON while keeping valid data unchanged.' },
     'zh-CN': { title: 'JSON 压缩工具', description: '移除 JSON 中的空白字符，同时保持数据含义不变。' },
     'zh-TW': { title: 'JSON 壓縮工具', description: '移除 JSON 中的空白字元，同時保持資料含義不變。' },
+    ja: { title: 'JSON圧縮ツール', description: 'JSONの意味を変えずに不要な空白を取り除きます。' },
+    ko: { title: 'JSON 압축 도구', description: '유효한 데이터는 그대로 두고 JSON의 불필요한 공백을 제거합니다.' },
   }, ['json', 'minify']),
   tool('json-to-csv', 'json-data-tools', 'text-transform', 'json-to-csv', {
     en: { title: 'JSON to CSV Converter', description: 'Convert an array of JSON objects into CSV with proper escaping.' },
     'zh-CN': { title: 'JSON 转 CSV', description: '将 JSON 对象数组转换为正确转义的 CSV。' },
     'zh-TW': { title: 'JSON 轉 CSV', description: '將 JSON 物件陣列轉換為正確轉義的 CSV。' },
+    ja: { title: 'JSONからCSVへ変換', description: 'JSONオブジェクトの配列を、適切にエスケープされたCSVへ変換します。' },
+    ko: { title: 'JSON to CSV 변환기', description: 'JSON 객체 배열을 올바르게 이스케이프된 CSV로 변환합니다.' },
   }, ['json', 'csv', 'converter']),
   tool('csv-to-json', 'json-data-tools', 'text-transform', 'csv-to-json', {
     en: { title: 'CSV to JSON Converter', description: 'Convert CSV rows into a JSON object array while handling quotes and commas.' },
     'zh-CN': { title: 'CSV 转 JSON', description: '将 CSV 行转换为 JSON 对象数组，并处理引号和逗号。' },
     'zh-TW': { title: 'CSV 轉 JSON', description: '將 CSV 列轉換為 JSON 物件陣列，並處理引號和逗號。' },
+    ja: { title: 'CSVからJSONへ変換', description: '引用符やカンマを処理しながら、CSV行をJSONオブジェクト配列へ変換します。' },
+    ko: { title: 'CSV to JSON 변환기', description: '따옴표와 쉼표를 처리하면서 CSV 행을 JSON 객체 배열로 변환합니다.' },
   }, ['csv', 'json', 'converter']),
   tool('query-string-parser', 'json-data-tools', 'text-analyze', 'query-string-parser', {
     en: { title: 'Query String Parser', description: 'Parse URL query strings into decoded keys, values, and repeated parameters.' },
     'zh-CN': { title: '查询字符串解析器', description: '将 URL 查询字符串解析为解码后的键、值和重复参数。' },
     'zh-TW': { title: '查詢字串解析器', description: '將 URL 查詢字串解析為解碼後的鍵、值和重複參數。' },
+    ja: { title: 'クエリ文字列パーサー', description: 'URLクエリ文字列をデコード済みのキー、値、重複パラメータに分解します。' },
+    ko: { title: '쿼리 문자열 파서', description: 'URL 쿼리 문자열을 디코딩된 키, 값, 반복 파라미터로 파싱합니다.' },
   }, ['query string', 'url']),
   tool('query-string-builder', 'json-data-tools', 'generator', 'query-string-builder', {
     en: { title: 'Query String Builder', description: 'Build encoded URL query strings from key-value pairs.' },
     'zh-CN': { title: '查询字符串生成器', description: '从键值对生成编码后的 URL 查询字符串。' },
     'zh-TW': { title: '查詢字串產生器', description: '從鍵值對產生編碼後的 URL 查詢字串。' },
+    ja: { title: 'クエリ文字列ビルダー', description: 'キーと値のペアから、URL向けにエンコードされたクエリ文字列を作成します。' },
+    ko: { title: '쿼리 문자열 빌더', description: '키-값 쌍으로 인코딩된 URL 쿼리 문자열을 만듭니다.' },
   }, ['query string', 'url']),
   tool('base64-encode-decode', 'encoding-decoding-tools', 'encode-decode', 'base64', {
     en: { title: 'Base64 Encode and Decode', description: 'Encode plain text to Base64 or decode Base64 back to readable text.' },
     'zh-CN': { title: 'Base64 编码解码', description: '将文本编码为 Base64，或将 Base64 解码为可读文本。' },
     'zh-TW': { title: 'Base64 編碼解碼', description: '將文字編碼為 Base64，或將 Base64 解碼為可讀文字。' },
+    ja: { title: 'Base64エンコード・デコード', description: 'プレーンテキストをBase64に変換し、Base64を読みやすいテキストへ戻します。' },
+    ko: { title: 'Base64 인코딩 및 디코딩', description: '일반 텍스트를 Base64로 인코딩하거나 Base64를 읽을 수 있는 텍스트로 디코딩합니다.' },
   }, ['base64', 'encode', 'decode']),
   tool('url-encode-decode', 'encoding-decoding-tools', 'encode-decode', 'url-codec', {
     en: { title: 'URL Encode and Decode', description: 'Encode URL components or decode percent-encoded strings safely.' },
     'zh-CN': { title: 'URL 编码解码', description: '安全编码 URL 组件，或解码百分号编码字符串。' },
     'zh-TW': { title: 'URL 編碼解碼', description: '安全編碼 URL 元件，或解碼百分比編碼字串。' },
+    ja: { title: 'URLエンコード・デコード', description: 'URLコンポーネントを安全にエンコードし、パーセントエンコード文字列をデコードします。' },
+    ko: { title: 'URL 인코딩 및 디코딩', description: 'URL 구성 요소를 안전하게 인코딩하거나 퍼센트 인코딩 문자열을 디코딩합니다.' },
   }, ['url', 'encode', 'decode']),
   tool('html-entity-encode-decode', 'encoding-decoding-tools', 'encode-decode', 'html-entity', {
     en: { title: 'HTML Entity Encode and Decode', description: 'Encode special HTML characters or decode named and numeric HTML entities.' },
     'zh-CN': { title: 'HTML 实体编码解码', description: '编码 HTML 特殊字符，或解码命名和数字实体。' },
     'zh-TW': { title: 'HTML 實體編碼解碼', description: '編碼 HTML 特殊字元，或解碼命名和數字實體。' },
+    ja: { title: 'HTMLエンティティ変換', description: 'HTML特殊文字をエンコードし、名前付き・数値エンティティをデコードします。' },
+    ko: { title: 'HTML 엔티티 인코딩 및 디코딩', description: 'HTML 특수 문자를 인코딩하거나 이름/숫자 HTML 엔티티를 디코딩합니다.' },
   }, ['html', 'entity', 'encode']),
   tool('word-counter', 'text-tools', 'text-analyze', 'word-counter', {
     en: { title: 'Word Counter', description: 'Count words, characters, sentences, paragraphs, and estimated reading time.' },
     'zh-CN': { title: '字数统计工具', description: '统计词数、字符数、句子、段落和预计阅读时间。' },
     'zh-TW': { title: '字數統計工具', description: '統計詞數、字元數、句子、段落和預估閱讀時間。' },
+    ja: { title: '文字数カウンター', description: '単語数、文字数、文、段落、推定読了時間を数えます。' },
+    ko: { title: '단어 수 계산기', description: '단어, 문자, 문장, 문단 수와 예상 읽기 시간을 계산합니다.' },
   }, ['text', 'counter']),
   tool('case-converter', 'text-tools', 'text-transform', 'case-converter', {
     en: { title: 'Case Converter', description: 'Convert text between uppercase, lowercase, title case, camelCase, and kebab-case.' },
     'zh-CN': { title: '大小写转换工具', description: '在大写、小写、标题格式、camelCase 和 kebab-case 之间转换文本。' },
     'zh-TW': { title: '大小寫轉換工具', description: '在大寫、小寫、標題格式、camelCase 和 kebab-case 之間轉換文字。' },
+    ja: { title: 'ケース変換ツール', description: '大文字、小文字、タイトルケース、camelCase、kebab-caseの間でテキストを変換します。' },
+    ko: { title: '대소문자 변환 도구', description: '텍스트를 대문자, 소문자, 제목 형식, camelCase, kebab-case로 변환합니다.' },
   }, ['text', 'case']),
   tool('slug-generator', 'text-tools', 'generator', 'slug-generator', {
     en: { title: 'Slug Generator', description: 'Create clean URL slugs from titles and phrases.' },
     'zh-CN': { title: 'Slug 生成器', description: '从标题和短语生成干净的 URL slug。' },
     'zh-TW': { title: 'Slug 產生器', description: '從標題和片語產生乾淨的 URL slug。' },
+    ja: { title: 'Slug生成ツール', description: 'タイトルやフレーズから、URLに使いやすいきれいなslugを作成します。' },
+    ko: { title: 'Slug 생성기', description: '제목과 문구에서 깔끔한 URL slug를 만듭니다.' },
   }, ['slug', 'url']),
   tool('jwt-decoder', 'encoding-decoding-tools', 'validator', 'jwt-decoder', {
     en: { title: 'JWT Decoder', description: 'Decode JWT headers and payloads locally without verifying signatures.' },
     'zh-CN': { title: 'JWT 解码器', description: '在本地解码 JWT 头部和载荷，不进行签名验证。' },
     'zh-TW': { title: 'JWT 解碼器', description: '在本機解碼 JWT 標頭和載荷，不進行簽章驗證。' },
+    ja: { title: 'JWTデコーダー', description: '署名検証は行わず、JWTのヘッダーとペイロードをローカルでデコードします。' },
+    ko: { title: 'JWT 디코더', description: '서명 검증 없이 JWT 헤더와 페이로드를 로컬에서 디코딩합니다.' },
   }, ['jwt', 'decode']),
   tool('uuid-generator', 'developer-tools', 'generator', 'uuid-generator', {
     en: { title: 'UUID v4 Generator', description: 'Generate random RFC 4122 UUID v4 identifiers in the browser.' },
     'zh-CN': { title: 'UUID v4 生成器', description: '在浏览器中生成随机 RFC 4122 UUID v4 标识符。' },
     'zh-TW': { title: 'UUID v4 產生器', description: '在瀏覽器中產生隨機 RFC 4122 UUID v4 識別碼。' },
+    ja: { title: 'UUID v4生成ツール', description: 'RFC 4122に準拠したランダムなUUID v4識別子をブラウザーで生成します。' },
+    ko: { title: 'UUID v4 생성기', description: '브라우저에서 RFC 4122 UUID v4 무작위 식별자를 생성합니다.' },
   }, ['uuid', 'id']),
   tool('ulid-generator', 'developer-tools', 'generator', 'ulid-generator', {
     en: { title: 'ULID Generator', description: 'Generate sortable ULID identifiers with timestamp prefixes.' },
     'zh-CN': { title: 'ULID 生成器', description: '生成带时间戳前缀、可排序的 ULID 标识符。' },
     'zh-TW': { title: 'ULID 產生器', description: '產生帶時間戳前綴、可排序的 ULID 識別碼。' },
+    ja: { title: 'ULID生成ツール', description: 'タイムスタンプ接頭辞を持つ、並べ替え可能なULID識別子を生成します。' },
+    ko: { title: 'ULID 생성기', description: '타임스탬프 접두사가 있는 정렬 가능한 ULID 식별자를 생성합니다.' },
   }, ['ulid', 'id']),
   tool('utm-builder', 'seo-tools', 'generator', 'utm-builder', {
     en: { title: 'UTM Builder', description: 'Build campaign URLs with source, medium, campaign, term, and content parameters.' },
     'zh-CN': { title: 'UTM 链接生成器', description: '生成包含 source、medium、campaign、term 和 content 参数的推广链接。' },
     'zh-TW': { title: 'UTM 連結產生器', description: '產生包含 source、medium、campaign、term 和 content 參數的推廣連結。' },
+    ja: { title: 'UTMリンク作成ツール', description: 'source、medium、campaign、term、contentを含むキャンペーンURLを作成します。' },
+    ko: { title: 'UTM 링크 생성기', description: 'source, medium, campaign, term, content 파라미터가 포함된 캠페인 URL을 만듭니다.' },
   }, ['seo', 'utm']),
   tool('meta-title-checker', 'seo-tools', 'text-analyze', 'meta-title-checker', {
     en: { title: 'Meta Title Checker', description: 'Check title length and preview whether a page title is SEO friendly.' },
     'zh-CN': { title: 'Meta Title 检查器', description: '检查标题长度，并预览页面标题是否适合 SEO。' },
     'zh-TW': { title: 'Meta Title 檢查器', description: '檢查標題長度，並預覽頁面標題是否適合 SEO。' },
+    ja: { title: 'メタタイトルチェッカー', description: 'ページタイトルの長さを確認し、SEOに適した表示かをプレビューします。' },
+    ko: { title: '메타 제목 검사기', description: '제목 길이를 확인하고 페이지 제목이 SEO에 적합한지 미리 봅니다.' },
   }, ['seo', 'title']),
   tool('hex-to-rgb', 'developer-tools', 'text-transform', 'hex-to-rgb', {
     en: { title: 'HEX to RGB Converter', description: 'Convert HEX color values into RGB channel values.' },
     'zh-CN': { title: 'HEX 转 RGB', description: '将 HEX 颜色值转换为 RGB 通道值。' },
     'zh-TW': { title: 'HEX 轉 RGB', description: '將 HEX 顏色值轉換為 RGB 通道值。' },
+    ja: { title: 'HEXからRGBへ変換', description: 'HEXカラー値をRGBチャンネル値へ変換します。' },
+    ko: { title: 'HEX to RGB 변환기', description: 'HEX 색상 값을 RGB 채널 값으로 변환합니다.' },
   }, ['color', 'hex', 'rgb']),
   tool('rgb-to-hex', 'developer-tools', 'text-transform', 'rgb-to-hex', {
     en: { title: 'RGB to HEX Converter', description: 'Convert RGB channel values into a HEX color.' },
     'zh-CN': { title: 'RGB 转 HEX', description: '将 RGB 通道值转换为 HEX 颜色。' },
     'zh-TW': { title: 'RGB 轉 HEX', description: '將 RGB 通道值轉換為 HEX 顏色。' },
+    ja: { title: 'RGBからHEXへ変換', description: 'RGBチャンネル値をHEXカラーへ変換します。' },
+    ko: { title: 'RGB to HEX 변환기', description: 'RGB 채널 값을 HEX 색상으로 변환합니다.' },
   }, ['color', 'rgb', 'hex']),
   tool('color-contrast-checker', 'developer-tools', 'validator', 'contrast-ratio', {
     en: { title: 'Color Contrast Checker', description: 'Calculate WCAG contrast ratio between two colors.' },
     'zh-CN': { title: '颜色对比度检查器', description: '计算两种颜色之间的 WCAG 对比度。' },
     'zh-TW': { title: '顏色對比度檢查器', description: '計算兩種顏色之間的 WCAG 對比度。' },
+    ja: { title: 'カラーコントラストチェッカー', description: '2色のWCAGコントラスト比を計算します。' },
+    ko: { title: '색상 대비 검사기', description: '두 색상 사이의 WCAG 대비 비율을 계산합니다.' },
   }, ['color', 'contrast', 'accessibility']),
   tool('timestamp-converter', 'developer-tools', 'text-transform', 'timestamp-converter', {
     en: { title: 'Timestamp Converter', description: 'Convert Unix timestamps to ISO dates and ISO dates back to Unix seconds.' },
     'zh-CN': { title: '时间戳转换器', description: '在 Unix 时间戳和 ISO 日期之间转换。' },
     'zh-TW': { title: '時間戳轉換器', description: '在 Unix 時間戳和 ISO 日期之間轉換。' },
+    ja: { title: 'タイムスタンプ変換ツール', description: 'UnixタイムスタンプとISO日時を相互に変換します。' },
+    ko: { title: '타임스탬프 변환기', description: 'Unix 타임스탬프와 ISO 날짜를 서로 변환합니다.' },
   }, ['timestamp', 'date']),
   tool('length-converter', 'developer-tools', 'text-transform', 'length-converter', {
     en: { title: 'Length Converter', description: 'Convert common metric and imperial length units.' },
     'zh-CN': { title: '长度单位转换器', description: '转换常见公制和英制长度单位。' },
     'zh-TW': { title: '長度單位轉換器', description: '轉換常見公制和英制長度單位。' },
+    ja: { title: '長さ単位変換ツール', description: '一般的なメートル法とヤード・ポンド法の長さ単位を変換します。' },
+    ko: { title: '길이 단위 변환기', description: '일반적인 미터법 및 야드파운드 길이 단위를 변환합니다.' },
   }, ['unit', 'length']),
   tool('weight-converter', 'developer-tools', 'text-transform', 'weight-converter', {
     en: { title: 'Weight Converter', description: 'Convert grams, kilograms, pounds, ounces, stones, and tons.' },
     'zh-CN': { title: '重量单位转换器', description: '转换克、千克、磅、盎司、英石和吨。' },
     'zh-TW': { title: '重量單位轉換器', description: '轉換克、公斤、磅、盎司、英石和噸。' },
+    ja: { title: '重さ単位変換ツール', description: 'グラム、キログラム、ポンド、オンス、ストーン、トンを変換します。' },
+    ko: { title: '무게 단위 변환기', description: '그램, 킬로그램, 파운드, 온스, 스톤, 톤을 변환합니다.' },
   }, ['unit', 'weight']),
   tool('temperature-converter', 'developer-tools', 'text-transform', 'temperature-converter', {
     en: { title: 'Temperature Converter', description: 'Convert Celsius, Fahrenheit, and Kelvin values.' },
     'zh-CN': { title: '温度单位转换器', description: '转换摄氏度、华氏度和开尔文。' },
     'zh-TW': { title: '溫度單位轉換器', description: '轉換攝氏、華氏和克氏溫標。' },
+    ja: { title: '温度変換ツール', description: '摂氏、華氏、ケルビンの温度値を変換します。' },
+    ko: { title: '온도 변환기', description: '섭씨, 화씨, 켈빈 값을 변환합니다.' },
   }, ['unit', 'temperature']),
   tool('data-size-converter', 'developer-tools', 'text-transform', 'data-size-converter', {
     en: { title: 'Data Size Converter', description: 'Convert bits, bytes, decimal units, and binary data units.' },
     'zh-CN': { title: '数据大小转换器', description: '转换 bit、byte、十进制单位和二进制数据单位。' },
     'zh-TW': { title: '資料大小轉換器', description: '轉換 bit、byte、十進位單位和二進位資料單位。' },
+    ja: { title: 'データサイズ変換ツール', description: 'ビット、バイト、10進単位、2進データ単位を変換します。' },
+    ko: { title: '데이터 크기 변환기', description: '비트, 바이트, 십진 단위, 이진 데이터 단위를 변환합니다.' },
   }, ['unit', 'data size']),
   tool('regex-tester', 'developer-tools', 'validator', 'regex-tester', {
     en: { title: 'Regex Tester', description: 'Test regular expressions and inspect matches, groups, and named groups.' },
     'zh-CN': { title: '正则表达式测试器', description: '测试正则表达式并查看匹配、分组和命名分组。' },
     'zh-TW': { title: '正規表示式測試器', description: '測試正規表示式並查看匹配、群組和命名群組。' },
+    ja: { title: '正規表現テスター', description: '正規表現を試し、マッチ、グループ、名前付きグループを確認します。' },
+    ko: { title: '정규식 테스터', description: '정규식을 테스트하고 매치, 그룹, 이름 있는 그룹을 확인합니다.' },
   }, ['regex', 'tester']),
   tool('markdown-toc-generator', 'text-tools', 'generator', 'markdown-toc', {
     en: { title: 'Markdown TOC Generator', description: 'Extract headings and generate a clean Markdown table of contents.' },
     'zh-CN': { title: 'Markdown 目录生成器', description: '提取标题并生成干净的 Markdown 目录。' },
     'zh-TW': { title: 'Markdown 目錄產生器', description: '擷取標題並產生乾淨的 Markdown 目錄。' },
+    ja: { title: 'Markdown目次生成ツール', description: '見出しを抽出し、整ったMarkdownの目次を生成します。' },
+    ko: { title: 'Markdown 목차 생성기', description: '제목을 추출해 깔끔한 Markdown 목차를 생성합니다.' },
   }, ['markdown', 'toc']),
   tool('password-generator', 'developer-tools', 'generator', 'password-generator', {
     en: { title: 'Password Generator', description: 'Generate strong random passwords locally with selected character sets.' },
     'zh-CN': { title: '密码生成器', description: '在本地生成包含所选字符集的强随机密码。' },
     'zh-TW': { title: '密碼產生器', description: '在本機產生包含所選字元集的強隨機密碼。' },
+    ja: { title: 'パスワード生成ツール', description: '選択した文字セットで強力なランダムパスワードをローカル生成します。' },
+    ko: { title: '비밀번호 생성기', description: '선택한 문자 집합으로 강력한 무작위 비밀번호를 로컬에서 생성합니다.' },
   }, ['password', 'random']),
   tool('random-string-generator', 'developer-tools', 'generator', 'random-string-generator', {
     en: { title: 'Random String Generator', description: 'Generate random strings for IDs, test data, and temporary tokens.' },
     'zh-CN': { title: '随机字符串生成器', description: '生成用于 ID、测试数据和临时令牌的随机字符串。' },
     'zh-TW': { title: '隨機字串產生器', description: '產生用於 ID、測試資料和暫時權杖的隨機字串。' },
+    ja: { title: 'ランダム文字列生成ツール', description: 'ID、テストデータ、一時トークン向けのランダム文字列を生成します。' },
+    ko: { title: '무작위 문자열 생성기', description: 'ID, 테스트 데이터, 임시 토큰에 사용할 무작위 문자열을 생성합니다.' },
   }, ['random', 'string']),
   tool('image-size-checker', 'image-tools', 'image', 'image-size-checker', {
     en: { title: 'Image Size Checker', description: 'Inspect image dimensions, file size, type, and aspect ratio locally.' },
     'zh-CN': { title: '图片尺寸检查器', description: '在本地检查图片尺寸、文件大小、类型和宽高比。' },
     'zh-TW': { title: '圖片尺寸檢查器', description: '在本機檢查圖片尺寸、檔案大小、類型和長寬比。' },
+    ja: { title: '画像サイズチェッカー', description: '画像の寸法、ファイルサイズ、種類、アスペクト比をローカルで確認します。' },
+    ko: { title: '이미지 크기 검사기', description: '이미지 크기, 파일 크기, 형식, 가로세로 비율을 로컬에서 확인합니다.' },
   }, ['image', 'size']),
   tool('image-to-base64', 'image-tools', 'image', 'image-to-base64', {
     en: { title: 'Image to Base64', description: 'Convert an image file to a Base64 data URI locally in your browser.' },
     'zh-CN': { title: '图片转 Base64', description: '在浏览器本地将图片文件转换为 Base64 Data URI。' },
     'zh-TW': { title: '圖片轉 Base64', description: '在瀏覽器本機將圖片檔案轉換為 Base64 Data URI。' },
+    ja: { title: '画像をBase64へ変換', description: '画像ファイルをブラウザー内でBase64データURIへ変換します。' },
+    ko: { title: '이미지 to Base64', description: '이미지 파일을 브라우저에서 로컬로 Base64 데이터 URI로 변환합니다.' },
   }, ['image', 'base64']),
   tool('introvert-extrovert-test', 'personality-tests', 'quiz', 'quiz-introvert-extrovert', {
     en: { title: 'Introvert or Extrovert Test', description: 'A non-clinical self-reflection quiz about social energy and communication style.' },
     'zh-CN': { title: '内向还是外向测试', description: '关于社交能量和沟通风格的非临床自我反思测试。' },
     'zh-TW': { title: '內向還是外向測驗', description: '關於社交能量和溝通風格的非臨床自我反思測驗。' },
+    ja: { title: '内向型・外向型セルフチェック', description: '社交エネルギーとコミュニケーション傾向を振り返る非臨床の自己理解クイズ。' },
+    ko: { title: '내향형 또는 외향형 테스트', description: '사회적 에너지와 의사소통 방식을 돌아보는 비임상 자기 성찰 퀴즈입니다.' },
   }, ['personality', 'quiz']),
   tool('stress-level-check-in', 'personality-tests', 'quiz', 'quiz-stress', {
     en: { title: 'Stress Level Check-in', description: 'A gentle self-reflection check-in for recent stress patterns, not a diagnosis.' },
     'zh-CN': { title: '压力水平自查', description: '用于近期压力模式的温和自我反思，不构成诊断。' },
     'zh-TW': { title: '壓力程度自查', description: '用於近期壓力模式的溫和自我反思，不構成診斷。' },
+    ja: { title: 'ストレス状態チェックイン', description: '最近のストレス傾向をやさしく振り返る非診断のセルフチェック。' },
+    ko: { title: '스트레스 수준 체크인', description: '최근 스트레스 패턴을 부드럽게 돌아보는 자기 성찰이며 진단이 아닙니다.' },
   }, ['stress', 'wellbeing']),
   tool('big-five-lite-reflection', 'personality-tests', 'quiz', 'quiz-big-five-lite', {
     en: { title: 'Big Five Lite Reflection', description: 'A short non-clinical reflection across five everyday personality-style themes.' },
     'zh-CN': { title: '大五人格轻量反思', description: '围绕五个日常性格风格主题的非临床简短自我反思。' },
     'zh-TW': { title: '大五人格輕量反思', description: '圍繞五個日常性格風格主題的非臨床簡短自我反思。' },
+    ja: { title: 'ビッグファイブ簡易リフレクション', description: '日常的な5つの性格傾向テーマを短く振り返る非臨床の自己理解クイズ。' },
+    ko: { title: '빅파이브 라이트 성찰', description: '다섯 가지 일상 성격 경향을 짧게 돌아보는 비임상 자기 성찰입니다.' },
   }, ['personality', 'big five']),
   tool('work-style-reflection', 'personality-tests', 'quiz', 'quiz-work-style', {
     en: { title: 'Work Style Reflection', description: 'Reflect on focus, collaboration, decision style, and follow-through at work.' },
     'zh-CN': { title: '工作风格反思', description: '反思工作中的专注、协作、决策风格和执行习惯。' },
     'zh-TW': { title: '工作風格反思', description: '反思工作中的專注、協作、決策風格和執行習慣。' },
+    ja: { title: '働き方リフレクション', description: '仕事での集中、協働、意思決定、やり切り方を振り返ります。' },
+    ko: { title: '업무 스타일 성찰', description: '일할 때의 집중, 협업, 의사결정 방식, 실행 습관을 돌아봅니다.' },
   }, ['work style', 'quiz']),
   tool('digital-wellbeing-reflection', 'personality-tests', 'quiz', 'quiz-digital-wellbeing', {
     en: { title: 'Digital Wellbeing Reflection', description: 'A non-clinical check-in on attention, boundaries, and recovery in technology use.' },
     'zh-CN': { title: '数字健康反思', description: '关于技术使用中的注意力、边界和恢复状态的非临床自查。' },
     'zh-TW': { title: '數位健康反思', description: '關於科技使用中的注意力、界線和恢復狀態的非臨床自查。' },
+    ja: { title: 'デジタルウェルビーイング振り返り', description: 'テクノロジー利用における注意、境界線、回復を確認する非臨床のセルフチェック。' },
+    ko: { title: '디지털 웰빙 성찰', description: '기술 사용에서의 주의력, 경계, 회복 상태를 살펴보는 비임상 체크인입니다.' },
   }, ['digital wellbeing', 'quiz']),
   tool('what-is-mmpi', 'clinical-assessment-guides', 'guide', undefined, {
     en: { title: 'What Is the MMPI?', description: 'An educational overview of the MMPI and why official interpretation requires qualified professionals.' },
     'zh-CN': { title: 'MMPI 是什么？', description: '介绍 MMPI 的用途、边界，以及为什么正式解释需要合格专业人士。' },
     'zh-TW': { title: 'MMPI 是什麼？', description: '介紹 MMPI 的用途、邊界，以及為什麼正式解釋需要合格專業人士。' },
+    ja: { title: 'MMPIとは？', description: 'MMPIの概要と、正式な解釈に資格を持つ専門家が必要な理由を学ぶ教育ガイド。' },
+    ko: { title: 'MMPI란 무엇인가요?', description: 'MMPI의 개요와 공식 해석에 자격을 갖춘 전문가가 필요한 이유를 설명하는 교육용 안내입니다.' },
   }, ['mmpi', 'guide']),
   tool('scl-90-overview', 'clinical-assessment-guides', 'guide', undefined, {
     en: { title: 'SCL-90 Overview', description: 'An educational guide to SCL-90 concepts, limitations, and responsible interpretation.' },
     'zh-CN': { title: 'SCL-90 症状自评量表介绍', description: '介绍 SCL-90 的概念、局限和负责任的理解方式。' },
     'zh-TW': { title: 'SCL-90 症狀自評量表介紹', description: '介紹 SCL-90 的概念、限制和負責任的理解方式。' },
+    ja: { title: 'SCL-90概要', description: 'SCL-90の概念、限界、責任ある読み取り方を説明する教育ガイド。' },
+    ko: { title: 'SCL-90 개요', description: 'SCL-90의 개념, 한계, 책임 있는 해석 방법을 설명하는 교육용 안내입니다.' },
   }, ['scl-90', 'guide']),
 ];
 
@@ -448,6 +546,8 @@ tools.push(
     en: { title: 'SHA-256 Generator', description: 'Generate SHA-256 hashes locally in your browser.' },
     'zh-CN': { title: 'SHA-256 生成器', description: '在浏览器本地生成 SHA-256 哈希。' },
     'zh-TW': { title: 'SHA-256 產生器', description: '在瀏覽器本機產生 SHA-256 雜湊。' },
+    ja: { title: 'SHA-256生成ツール', description: 'ブラウザー内でSHA-256ハッシュをローカル生成します。' },
+    ko: { title: 'SHA-256 생성기', description: '브라우저에서 SHA-256 해시를 로컬로 생성합니다.' },
   }, ['hash', 'sha256']),
   tool('sha512-generator', 'developer-tools', 'generator', 'hash-sha512', {
     en: { title: 'SHA-512 Generator', description: 'Generate SHA-512 hashes locally in your browser.' },
@@ -458,6 +558,8 @@ tools.push(
     en: { title: 'Percentage Calculator', description: 'Calculate what percentage one value is of another.' },
     'zh-CN': { title: '百分比计算器', description: '计算一个数值占另一个数值的百分比。' },
     'zh-TW': { title: '百分比計算器', description: '計算一個數值佔另一個數值的百分比。' },
+    ja: { title: 'パーセンテージ計算機', description: 'ある値が別の値の何パーセントにあたるかを計算します。' },
+    ko: { title: '백분율 계산기', description: '한 값이 다른 값의 몇 퍼센트인지 계산합니다.' },
   }, ['percentage', 'calculator']),
   tool('percentage-change-calculator', 'developer-tools', 'text-transform', 'percentage-change', {
     en: { title: 'Percentage Change Calculator', description: 'Calculate percentage increase or decrease between two values.' },
@@ -473,6 +575,8 @@ tools.push(
     en: { title: 'Loan Payment Calculator', description: 'Estimate monthly loan payments from principal, rate, and term.' },
     'zh-CN': { title: '贷款月供计算器', description: '根据本金、利率和期限估算贷款月供。' },
     'zh-TW': { title: '貸款月付金計算器', description: '根據本金、利率和期限估算貸款月付金。' },
+    ja: { title: 'ローン返済額計算機', description: '元本、利率、期間から毎月のローン返済額を見積もります。' },
+    ko: { title: '대출 상환 계산기', description: '원금, 이율, 기간을 바탕으로 월별 대출 상환액을 추정합니다.' },
   }, ['finance', 'loan']),
   tool('compound-interest-calculator', 'developer-tools', 'text-transform', 'compound-interest', {
     en: { title: 'Compound Interest Calculator', description: 'Estimate compound growth over time with repeated compounding.' },
@@ -483,11 +587,15 @@ tools.push(
     en: { title: 'Number Base Converter', description: 'Convert integers between bases from binary to base 36.' },
     'zh-CN': { title: '进制转换器', description: '在二进制到 36 进制之间转换整数。' },
     'zh-TW': { title: '進位轉換器', description: '在二進位到 36 進位之間轉換整數。' },
+    ja: { title: '進数変換ツール', description: '整数を2進数から36進数までの任意の基数間で変換します。' },
+    ko: { title: '진법 변환기', description: '정수를 2진수부터 36진수까지 서로 변환합니다.' },
   }, ['number', 'base']),
   tool('cron-expression-explainer', 'developer-tools', 'text-analyze', 'cron-explainer', {
     en: { title: 'Cron Expression Explainer', description: 'Explain basic five-field cron expressions in readable language.' },
     'zh-CN': { title: 'Cron 表达式解释器', description: '用可读语言解释基础五字段 Cron 表达式。' },
     'zh-TW': { title: 'Cron 表達式解釋器', description: '用可讀語言解釋基礎五欄位 Cron 表達式。' },
+    ja: { title: 'Cron式解説ツール', description: '基本的な5フィールドのCron式を読みやすい言葉で説明します。' },
+    ko: { title: 'Cron 표현식 설명기', description: '기본 5필드 Cron 표현식을 읽기 쉬운 문장으로 설명합니다.' },
   }, ['cron', 'developer']),
   tool('css-clamp-generator', 'developer-tools', 'generator', 'css-clamp', {
     en: { title: 'CSS Clamp Generator', description: 'Generate responsive CSS clamp() values from pixel ranges.' },
@@ -533,16 +641,22 @@ tools.push(
     en: { title: 'Canonical Tag Generator', description: 'Generate a safe canonical link tag for a page URL.' },
     'zh-CN': { title: 'Canonical 标签生成器', description: '为页面 URL 生成安全的 canonical 链接标签。' },
     'zh-TW': { title: 'Canonical 標籤產生器', description: '為頁面 URL 產生安全的 canonical 連結標籤。' },
+    ja: { title: 'Canonicalタグ生成ツール', description: 'ページURLに使う安全なcanonicalリンクタグを生成します。' },
+    ko: { title: 'Canonical 태그 생성기', description: '페이지 URL에 사용할 안전한 canonical 링크 태그를 생성합니다.' },
   }, ['seo', 'canonical']),
   tool('hreflang-tag-generator', 'seo-tools', 'generator', 'hreflang-tag-generator', {
     en: { title: 'Hreflang Tag Generator', description: 'Generate alternate hreflang link tags for multilingual pages.' },
     'zh-CN': { title: 'Hreflang 标签生成器', description: '为多语言页面生成 alternate hreflang 链接标签。' },
     'zh-TW': { title: 'Hreflang 標籤產生器', description: '為多語言頁面產生 alternate hreflang 連結標籤。' },
+    ja: { title: 'Hreflangタグ生成ツール', description: '多言語ページ向けのalternate hreflangリンクタグを生成します。' },
+    ko: { title: 'Hreflang 태그 생성기', description: '다국어 페이지용 alternate hreflang 링크 태그를 생성합니다.' },
   }, ['seo', 'hreflang']),
   tool('robots-txt-generator', 'seo-tools', 'generator', 'robots-txt-generator', {
     en: { title: 'Robots.txt Generator', description: 'Generate a simple robots.txt file with allow, disallow, and sitemap lines.' },
     'zh-CN': { title: 'Robots.txt 生成器', description: '生成包含 allow、disallow 和 sitemap 行的 robots.txt。' },
     'zh-TW': { title: 'Robots.txt 產生器', description: '產生包含 allow、disallow 和 sitemap 行的 robots.txt。' },
+    ja: { title: 'Robots.txt生成ツール', description: 'allow、disallow、sitemap行を含むシンプルなrobots.txtを生成します。' },
+    ko: { title: 'Robots.txt 생성기', description: 'allow, disallow, sitemap 줄이 포함된 간단한 robots.txt 파일을 생성합니다.' },
   }, ['seo', 'robots']),
   tool('faq-schema-generator', 'seo-tools', 'generator', 'faq-schema-generator', {
     en: { title: 'FAQ Schema Generator', description: 'Generate FAQPage JSON-LD structured data.' },
@@ -583,6 +697,8 @@ tools.push(
     en: { title: 'Image Resize Calculator', description: 'Calculate resized image dimensions while preserving aspect ratio.' },
     'zh-CN': { title: '图片尺寸缩放计算器', description: '在保持宽高比的情况下计算图片缩放尺寸。' },
     'zh-TW': { title: '圖片尺寸縮放計算器', description: '在保持長寬比的情況下計算圖片縮放尺寸。' },
+    ja: { title: '画像リサイズ計算ツール', description: 'アスペクト比を保ちながら、リサイズ後の画像寸法を計算します。' },
+    ko: { title: '이미지 크기 조정 계산기', description: '가로세로 비율을 유지하면서 조정된 이미지 크기를 계산합니다.' },
   }, ['image', 'resize']),
   tool('image-rotation-normalizer', 'image-tools', 'image', 'image-rotation-normalizer', {
     en: { title: 'Image Rotation Normalizer', description: 'Normalize arbitrary rotation degrees into a 0-359 degree range.' },

@@ -42,6 +42,18 @@ test('localized search matches Chinese content', async ({ page }) => {
   await expect(page.getByRole('link', { name: /压力水平自查/i })).toBeVisible();
 });
 
+test('priority localized search and privacy pages avoid English fallback', async ({ page }) => {
+  await page.goto('/ja/search/');
+  await expect(page.getByText('/ でフォーカス')).toBeVisible();
+  await page.getByRole('searchbox').fill('JSON');
+  await expect(page.getByRole('link', { name: /JSONフォーマッター/i })).toBeVisible();
+
+  await page.goto('/ko/privacy/');
+  await expect(page.getByRole('heading', { name: '개인정보 처리방침' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '로컬 처리' })).toBeVisible();
+  await expect(page.getByText(/심리 관련 답변을 수집하지 않습니다/)).toBeVisible();
+});
+
 test('reflection quiz records answers and shows result', async ({ page }) => {
   await page.goto('/tools/big-five-lite-reflection/');
   await expect(page.locator('aside').filter({ hasText: /personal insight/i })).toBeVisible();

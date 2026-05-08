@@ -1,4 +1,5 @@
 import type { Locale } from './locales';
+import { getPageCopy } from './pageCopy';
 import type { Tool } from './types';
 
 export type ToolSeoSection = {
@@ -132,18 +133,17 @@ export function getToolSeoSections(tool: Tool, locale: Locale): ToolSeoSection[]
 
 function buildFallbackSections(tool: Tool, locale: Locale): ToolSeoSection[] {
   const seo = tool.seo[locale];
+  const copy = getPageCopy(locale);
   return [
     {
-      heading: 'What this tool helps with',
+      heading: copy.toolHelpHeading,
       body: seo.intro,
       items: seo.useCases,
     },
     {
-      heading: tool.isLocalOnly ? 'Privacy and processing notes' : 'Reading and interpretation notes',
-      body: tool.isLocalOnly
-        ? 'This page is designed for browser-side work whenever the task can be completed locally. Review the output before copying, downloading, or sharing it.'
-        : 'Use this page as an educational guide. It summarizes concepts without replacing official documentation, expert review, or professional judgment.',
-      items: tool.isLocalOnly ? ['Input stays in the browser for local tools', 'Results can be copied or downloaded when supported', 'Refresh the page to clear temporary state'] : ['Read the limitations before acting', 'Use official sources for decisions', 'Avoid treating general guidance as a diagnosis'],
+      heading: tool.isLocalOnly ? copy.privacyProcessingHeading : copy.readingNotesHeading,
+      body: tool.isLocalOnly ? copy.localProcessingBody : copy.guideInterpretationBody,
+      items: tool.isLocalOnly ? copy.localProcessingItems : copy.guideInterpretationItems,
     },
   ];
 }

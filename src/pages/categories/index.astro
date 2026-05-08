@@ -1,11 +1,13 @@
 ---
 import { categories } from '@/data/content';
 import { localeCopy } from '@/data/locales';
+import { getPageCopy } from '@/data/pageCopy';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLocalizedPath } from '@/lib/i18n/routing';
 const locale = 'en';
 const copy = localeCopy[locale];
+const pageCopy = getPageCopy(locale);
 ---
-<BaseLayout locale={locale} title="Tool Categories | TovolBox" description="Browse all TovolBox web tool categories." route={{ locale, kind: 'categories' }}>
+<BaseLayout locale={locale} title={`${pageCopy.categoriesTitle} | TovolBox`} description={pageCopy.categoriesDescription} route={{ locale, kind: 'categories' }}>
   <section class="container" style="padding: 3rem 0;"><h1>{copy.allCategories}</h1><div class="grid-auto">{categories.map((category) => <a class="card" style="padding: 1.1rem;" href={getLocalizedPath({ locale, kind: 'category', slug: category.slug })}><h2>{category.seo[locale].h1}</h2><p style="color: var(--muted);">{category.seo[locale].description}</p></a>)}</div></section>
 </BaseLayout>

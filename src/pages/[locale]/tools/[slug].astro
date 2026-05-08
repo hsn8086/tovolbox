@@ -3,6 +3,7 @@ import ToolIsland from '@/components/ToolIsland.astro';
 import ToolCard from '@/components/ToolCard.astro';
 import { getCategory, getTool, tools } from '@/data/content';
 import { localeCopy, locales, type Locale } from '@/data/locales';
+import { getPageCopy } from '@/data/pageCopy';
 import { getToolSeoSections } from '@/data/seoContent';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCanonicalUrl, getLocalizedPath } from '@/lib/i18n/routing';
@@ -13,6 +14,7 @@ const locale = Astro.params.locale as Locale;
 const tool = getTool(Astro.params.slug!)!;
 const seo = tool.seo[locale];
 const copy = localeCopy[locale];
+const pageCopy = getPageCopy(locale);
 const category = getCategory(tool.categorySlug)!;
 const categorySeo = category.seo[locale];
 const sections = getToolSeoSections(tool, locale);
@@ -26,11 +28,11 @@ const breadcrumbItems = [
 <BaseLayout locale={locale} title={seo.title} description={seo.description} route={{ locale, kind: 'tool', slug: tool.slug }} jsonLd={[toolJsonLd(seo.h1, seo.description, Astro.url.toString()), breadcrumbJsonLd(breadcrumbItems), faqJsonLd(seo.faq)]}>
   <section class="container" style="padding: 3rem 0; display: grid; gap: 1.25rem;">
     <nav aria-label="Breadcrumb" style="color: var(--muted); font-weight: 700;"><a href={getLocalizedPath({ locale, kind: 'home' })}>{copy.siteName}</a> / <a href={getLocalizedPath({ locale, kind: 'category', slug: category.slug })}>{categorySeo.h1}</a> / <span>{seo.h1}</span></nav>
-    <div><span class="badge">{tool.status === 'live' ? 'Live tool' : 'Guide'}</span><h1 style="font-size: clamp(2rem, 6vw, 4rem); margin: 1rem 0;">{seo.h1}</h1><p style="color: var(--muted); max-width: 820px; line-height: 1.75; font-size: 1.1rem;">{seo.intro}</p></div>
+    <div><span class="badge">{tool.status === 'live' ? pageCopy.liveToolBadge : pageCopy.guideBadge}</span><h1 style="font-size: clamp(2rem, 6vw, 4rem); margin: 1rem 0;">{seo.h1}</h1><p style="color: var(--muted); max-width: 820px; line-height: 1.75; font-size: 1.1rem;">{seo.intro}</p></div>
     {tool.isLocalOnly && <aside class="card" style="padding: 1rem;"><strong>{copy.privacy}:</strong> {copy.localOnly}</aside>}
-    {tool.isYMYL && <aside class="card" style="padding: 1rem; border-color: #fbbf24;">This test is for self-reflection and educational purposes only. It is not a medical diagnosis, clinical psychological assessment, or substitute for care from a qualified mental health professional.</aside>}
+    {tool.isYMYL && <aside class="card" style="padding: 1rem; border-color: #fbbf24;">{pageCopy.ymylDisclaimer}</aside>}
     <ToolIsland component={tool.component} title={seo.h1} />
-    <section class="card" style="padding: 1.25rem;"><h2>Use cases</h2><ul>{seo.useCases.map((item) => <li>{item}</li>)}</ul></section>
+    <section class="card" style="padding: 1.25rem;"><h2>{pageCopy.useCases}</h2><ul>{seo.useCases.map((item) => <li>{item}</li>)}</ul></section>
     <div class="grid-auto">{sections.map((section) => <section class="card" style="padding: 1.25rem;"><h2>{section.heading}</h2><p style="color: var(--muted); line-height: 1.7;">{section.body}</p><ul>{section.items.map((item) => <li>{item}</li>)}</ul></section>)}</div>
     <section class="card" style="padding: 1.25rem;"><h2>{copy.howToUse}</h2><ol>{seo.howToUse.map((item) => <li>{item}</li>)}</ol></section>
     <section class="card" style="padding: 1.25rem;"><h2>{copy.faq}</h2>{seo.faq.map((item) => <details><summary>{item.question}</summary><p>{item.answer}</p></details>)}</section>

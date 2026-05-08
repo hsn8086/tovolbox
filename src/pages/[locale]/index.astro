@@ -2,6 +2,7 @@
 import ToolCard from '@/components/ToolCard.astro';
 import { categories, tools } from '@/data/content';
 import { localeCopy, locales, type Locale } from '@/data/locales';
+import { getPageCopy } from '@/data/pageCopy';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getLocalizedPath } from '@/lib/i18n/routing';
 import { websiteJsonLd } from '@/lib/seo/jsonld';
@@ -12,14 +13,16 @@ export function getStaticPaths() {
 
 const locale = Astro.params.locale as Locale;
 const copy = localeCopy[locale];
+const pageCopy = getPageCopy(locale);
 const featured = tools.filter((tool) => tool.status === 'live').slice(0, 8);
 ---
 
 <BaseLayout locale={locale} title={`TovolBox | ${copy.tools}`} description={copy.tagline} route={{ locale, kind: 'home' }} jsonLd={[websiteJsonLd(Astro.site?.toString())]}>
   <section class="container" style="padding: 4rem 0 2rem;">
     <div style="max-width: 760px;">
-      <span class="badge">TovolBox</span>
-      <h1 style="font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1; margin: 1rem 0;">{copy.tagline}</h1>
+      <span class="badge">{pageCopy.homeBadge}</span>
+      <h1 style="font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1; margin: 1rem 0;">{pageCopy.homeTitle}</h1>
+      <p style="font-size: 1.2rem; color: var(--muted); line-height: 1.7;">{copy.tagline}</p>
       <div style="display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1.5rem;">
         <a class="btn" href={getLocalizedPath({ locale, kind: 'search' })}>{copy.search}</a>
         <a class="btn btn-secondary" href={getLocalizedPath({ locale, kind: 'categories' })}>{copy.allCategories}</a>
