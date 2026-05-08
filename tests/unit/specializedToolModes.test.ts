@@ -3,6 +3,7 @@ import { getColorMode } from '@/islands/tools/ColorTool';
 import { getDataMode } from '@/islands/tools/DataTool';
 import { getDeveloperMode } from '@/islands/tools/DeveloperTool';
 import { getEncodeCryptoMode } from '@/islands/tools/EncodeCryptoTool';
+import { getQrMode } from '@/islands/tools/QrTool';
 import { getSeoMode } from '@/islands/tools/SeoTool';
 import { getSvgMode } from '@/islands/tools/SvgTool';
 import { getTextMode } from '@/islands/tools/TextTool';
@@ -25,5 +26,6 @@ describe('specialized tool mode routing', () => {
   it('maps encode and crypto tools', () => expect(getEncodeCryptoMode('hash-sha256')).toBe('hash-sha256'));
   it('maps seo tools', () => expect(getSeoMode('robots-txt-generator')).toBe('robots-txt-generator'));
   it('maps developer tools', () => expect(getDeveloperMode('cron-explainer')).toBe('cron-explainer'));
+  it('maps QR tools', () => expect(getQrMode('qr-code-reader')).toBe('qr-code-reader'));
   it('maps svg tools', () => expect(getSvgMode('svg-to-jsx')).toBe('svg-to-jsx'));
 });

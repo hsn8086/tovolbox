@@ -7,6 +7,7 @@ import DeveloperTool from '@/islands/tools/DeveloperTool.tsx';
 import EncodeCryptoTool from '@/islands/tools/EncodeCryptoTool.tsx';
 import GenericTool from '@/islands/tools/GenericTool.tsx';
 import ImageCanvasTool from '@/islands/tools/ImageCanvasTool.tsx';
+import QrTool from '@/islands/tools/QrTool.tsx';
 import ReflectionQuizTool from '@/islands/tools/ReflectionQuizTool.tsx';
 import SeoTool from '@/islands/tools/SeoTool.tsx';
 import SvgTool from '@/islands/tools/SvgTool.tsx';
@@ -34,6 +35,7 @@ const kind = component ? getToolRegistryKind(component) : undefined;
 {component && kind === 'encode-crypto' ? <EncodeCryptoTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
 {component && kind === 'seo' ? <SeoTool client:load component={component} title={title} /> : null}
 {component && kind === 'developer' ? <DeveloperTool client:load component={component} title={title} /> : null}
+{component && kind === 'qr' ? <QrTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
 {component && kind === 'svg' ? <SvgTool client:load component={component} title={title} /> : null}
 {component && kind === 'generic' ? <GenericTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
 {!component ? (

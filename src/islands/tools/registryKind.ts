@@ -5,8 +5,9 @@ const colorTools = new Set(['hex-to-rgb', 'rgb-to-hex', 'rgb-to-hsl', 'hsl-to-rg
 const encodeCryptoTools = new Set(['base64', 'url-codec', 'html-entity', 'jwt-decoder', 'password-generator', 'random-string-generator', 'uuid-generator', 'ulid-generator']);
 const seoTools = new Set(['meta-title-checker', 'meta-description-checker', 'serp-preview', 'open-graph-preview', 'twitter-card-preview', 'canonical-tag-generator', 'hreflang-tag-generator', 'robots-txt-generator', 'faq-schema-generator', 'breadcrumb-schema-generator', 'utm-builder']);
 const developerTools = new Set(['regex-tester', 'cron-explainer', 'percentage-calculator', 'percentage-change', 'discount-calculator', 'loan-calculator', 'compound-interest', 'number-base-converter', 'wifi-qr-payload', 'vcard-payload', 'mailto-builder', 'ean13-validator', 'file-summary', 'base64-size-estimator']);
+const qrTools = new Set(['qr-code-generator', 'qr-code-reader']);
 
-export type ToolRegistryKind = 'quiz' | 'image-canvas' | 'data' | 'text' | 'unit' | 'color' | 'encode-crypto' | 'seo' | 'developer' | 'svg' | 'generic';
+export type ToolRegistryKind = 'quiz' | 'image-canvas' | 'data' | 'text' | 'unit' | 'color' | 'encode-crypto' | 'seo' | 'developer' | 'qr' | 'svg' | 'generic';
 
 export function getToolRegistryKind(component: string): ToolRegistryKind {
   if (component.startsWith('quiz-')) return 'quiz';
@@ -18,6 +19,7 @@ export function getToolRegistryKind(component: string): ToolRegistryKind {
   if (component.startsWith('hash-') || encodeCryptoTools.has(component)) return 'encode-crypto';
   if (seoTools.has(component)) return 'seo';
   if (developerTools.has(component)) return 'developer';
+  if (qrTools.has(component)) return 'qr';
   if (component.startsWith('svg-')) return 'svg';
   return 'generic';
 }

@@ -4,6 +4,7 @@ import DeveloperTool from './DeveloperTool';
 import EncodeCryptoTool from './EncodeCryptoTool';
 import GenericTool from './GenericTool';
 import ImageCanvasTool from './ImageCanvasTool';
+import QrTool from './QrTool';
 import ReflectionQuizTool from './ReflectionQuizTool';
 import SeoTool from './SeoTool';
 import SvgTool from './SvgTool';
@@ -32,6 +33,7 @@ export default function ToolRegistry({ component, title, privacyNote, ymylDiscla
   if (kind === 'encode-crypto') return <EncodeCryptoTool component={component} title={title} privacyNote={privacyNote} />;
   if (kind === 'seo') return <SeoTool component={component} title={title} />;
   if (kind === 'developer') return <DeveloperTool component={component} title={title} />;
+  if (kind === 'qr') return <QrTool component={component} title={title} privacyNote={privacyNote} />;
   if (kind === 'svg') return <SvgTool component={component} title={title} />;
   return <GenericTool component={component} title={title} privacyNote={privacyNote} />;
 }

@@ -84,6 +84,7 @@ describe('filterSearchItems', () => {
     expect(searchItems.some((item) => item.slug === 'json-formatter' && item.url === '/tools/json-formatter/')).toBe(true);
     expect(searchItems.some((item) => item.slug === 'yaml-to-json' && item.url === '/tools/yaml-to-json/')).toBe(true);
     expect(searchItems.some((item) => item.slug === 'markdown-previewer' && item.url === '/tools/markdown-previewer/')).toBe(true);
+    expect(searchItems.some((item) => item.slug === 'qr-code-generator' && item.url === '/tools/qr-code-generator/')).toBe(true);
     expect(searchItems.some((item) => item.type === 'category' && item.categorySlug === item.slug)).toBe(true);
   });
 });

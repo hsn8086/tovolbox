@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildQrMatrix,
   buildMailtoPayload,
   buildVCardPayload,
   buildWifiQrPayload,
+  qrMatrixToSvg,
   validateEan13,
 } from '@/lib/tools/qr';
 
@@ -72,5 +74,32 @@ describe('validateEan13', () => {
     expect(validateEan13('5901234123450')).toBe(false);
     expect(validateEan13('400638133393')).toBe(false);
     expect(validateEan13('400638133393x')).toBe(false);
+  });
+});
+
+describe('QR matrix helpers', () => {
+  it('builds a QR matrix with a pluggable factory', () => {
+    const matrix = buildQrMatrix('hello', () => ({
+      modules: {
+        size: 2,
+        get: (row, col) => (row === col ? 1 : 0),
+      },
+    }));
+
+    expect(matrix).toEqual({
+      size: 2,
+      cells: [
+        [true, false],
+        [false, true],
+      ],
+    });
+  });
+
+  it('renders matrix data as compact SVG path commands', () => {
+    expect(qrMatrixToSvg({ size: 2, cells: [[true, false], [false, true]] }, 1)).toContain('M1 1h1v1h-1z M2 2h1v1h-1z');
+  });
+
+  it('rejects empty QR content', () => {
+    expect(() => buildQrMatrix('', () => ({ modules: { size: 1, get: () => 1 } }))).toThrow(/cannot be empty/i);
   });
 });

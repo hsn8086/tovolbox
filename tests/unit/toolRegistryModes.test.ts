@@ -38,6 +38,8 @@ describe('specialized tool modes', () => {
     expect(getToolRegistryKind('hash-sha256')).toBe('encode-crypto');
     expect(getToolRegistryKind('robots-txt-generator')).toBe('seo');
     expect(getToolRegistryKind('cron-explainer')).toBe('developer');
+    expect(getToolRegistryKind('qr-code-generator')).toBe('qr');
+    expect(getToolRegistryKind('qr-code-reader')).toBe('qr');
     expect(getToolRegistryKind('svg-to-jsx')).toBe('svg');
     expect(getToolRegistryKind('unknown-tool')).toBe('generic');
   });

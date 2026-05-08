@@ -129,6 +129,30 @@ select {
   padding: 0;
 }
 
+.qr-preview {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(45deg, #f8fafc 25%, transparent 25%),
+    linear-gradient(-45deg, #f8fafc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f8fafc 75%),
+    linear-gradient(-45deg, transparent 75%, #f8fafc 75%);
+  background-color: white;
+  background-position: 0 0, 0 0.5rem, 0.5rem -0.5rem, -0.5rem 0;
+  background-size: 1rem 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.qr-preview svg {
+  width: min(240px, 100%);
+  height: auto;
+  image-rendering: pixelated;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

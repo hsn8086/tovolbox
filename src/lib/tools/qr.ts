@@ -28,6 +28,24 @@ export interface MailtoPayloadOptions {
   bcc?: string;
 }
 
+export type QrErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
+
+export interface QrMatrixOptions {
+  errorCorrectionLevel?: QrErrorCorrectionLevel;
+}
+
+export interface QrMatrix {
+  size: number;
+  cells: boolean[][];
+}
+
+type QrCodeFactory = (text: string, options?: QrMatrixOptions) => {
+  modules: {
+    size: number;
+    get(row: number, col: number): number;
+  };
+};
+
 const escapeWifiValue = (value: string): string => value.replace(/[\\;,:\"]/g, '\\$&');
 
 const escapeVCardValue = (value: string): string =>
@@ -121,4 +139,39 @@ export function validateEan13(value: string): boolean {
   const expectedCheckDigit = (10 - (sum % 10)) % 10;
 
   return checkDigit === expectedCheckDigit;
+}
+
+export function buildQrMatrix(text: string, createQrCode: QrCodeFactory, options: QrMatrixOptions = {}): QrMatrix {
+  if (text.length === 0) {
+    throw new Error('QR content cannot be empty.');
+  }
+
+  const qrCode = createQrCode(text, { errorCorrectionLevel: options.errorCorrectionLevel ?? 'M' });
+  const size = qrCode.modules.size;
+  const cells = Array.from({ length: size }, (_, row) => {
+    return Array.from({ length: size }, (_, col) => Boolean(qrCode.modules.get(row, col)));
+  });
+
+  return { size, cells };
+}
+
+export function qrMatrixToSvg(matrix: QrMatrix, margin = 4): string {
+  const quietZone = Math.max(0, Math.floor(margin));
+  const viewBoxSize = matrix.size + quietZone * 2;
+  const paths: string[] = [];
+
+  for (let row = 0; row < matrix.size; row += 1) {
+    for (let col = 0; col < matrix.size; col += 1) {
+      if (matrix.cells[row]?.[col]) {
+        paths.push(`M${col + quietZone} ${row + quietZone}h1v1h-1z`);
+      }
+    }
+  }
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" role="img" aria-label="QR code">`,
+    '<rect width="100%" height="100%" fill="#fff"/>',
+    `<path fill="#000" d="${paths.join(' ')}"/>`,
+    '</svg>',
+  ].join('');
 }

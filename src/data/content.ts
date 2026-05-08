@@ -810,6 +810,16 @@ tools.push(
     'zh-CN': { title: 'vCard 内容生成器', description: '生成用于联系人二维码的 vCard 文本。' },
     'zh-TW': { title: 'vCard 內容產生器', description: '產生用於聯絡人 QR Code 的 vCard 文字。' },
   }, ['qr', 'vcard']),
+  tool('qr-code-generator', 'developer-tools', 'generator', 'qr-code-generator', {
+    en: { title: 'QR Code Generator', description: 'Generate a QR code as SVG or PNG locally from URLs, text, WiFi payloads, or contact data.' },
+    'zh-CN': { title: '二维码生成器', description: '在本地从 URL、文本、WiFi 载荷或联系人数据生成 SVG 或 PNG 二维码。' },
+    'zh-TW': { title: 'QR Code 產生器', description: '在本機從 URL、文字、WiFi 內容或聯絡人資料產生 SVG 或 PNG QR Code。' },
+  }, ['qr', 'generator', 'svg', 'png']),
+  tool('qr-code-reader', 'developer-tools', 'image', 'qr-code-reader', {
+    en: { title: 'QR Code Reader', description: 'Decode QR code images locally in the browser without uploading the file.' },
+    'zh-CN': { title: '二维码读取器', description: '在浏览器本地解码二维码图片，文件不会上传。' },
+    'zh-TW': { title: 'QR Code 讀取器', description: '在瀏覽器本機解碼 QR Code 圖片，檔案不會上傳。' },
+  }, ['qr', 'reader', 'image', 'decode']),
   tool('mailto-link-builder', 'developer-tools', 'generator', 'mailto-builder', {
     en: { title: 'Mailto Link Builder', description: 'Build mailto links with subject, body, cc, and bcc parameters.' },
     'zh-CN': { title: 'Mailto 链接生成器', description: '生成包含主题、正文、抄送和密送参数的 mailto 链接。' },

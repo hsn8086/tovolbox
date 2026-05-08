@@ -2,11 +2,19 @@ import { expect, test, type Page } from '@playwright/test';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { toDataURL } from 'qrcode';
 
 function samplePngPath(): string {
   const source = path.join(process.cwd(), 'tests/fixtures/sample.png.base64');
   const target = path.join(os.tmpdir(), 'sample.png');
   fs.writeFileSync(target, Buffer.from(fs.readFileSync(source, 'utf8').trim(), 'base64'));
+  return target;
+}
+
+async function qrPngPath(payload: string): Promise<string> {
+  const dataUrl = await toDataURL(payload, { width: 256, margin: 2 });
+  const target = path.join(os.tmpdir(), 'sample-qr.png');
+  fs.writeFileSync(target, Buffer.from(dataUrl.split(',')[1] ?? '', 'base64'));
   return target;
 }
 
@@ -268,4 +276,18 @@ test('new stage 12 data and text tools expose useful outputs', async ({ page }) 
   await page.getByRole('textbox', { name: 'Input' }).fill('# Preview\n\nUse **bold** and `code`.');
   await expect(page.getByRole('region', { name: 'Markdown preview' })).toContainText('Preview');
   await expect(page.getByRole('region', { name: 'Markdown preview' }).locator('strong')).toContainText('bold');
+});
+
+test('QR tools generate and read codes locally', async ({ page }) => {
+  await page.goto('/tools/qr-code-generator/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'QR content' }).fill('https://tovolbox.hsn8086.com/tools/qr-code-generator/');
+  await expect(page.getByRole('img', { name: 'Generated QR code' })).toBeVisible();
+  await expect(page.getByLabel('Output')).toContainText('<svg');
+  await expect(page.getByRole('link', { name: /Download PNG/i })).toBeVisible();
+
+  await page.goto('/tools/qr-code-reader/');
+  await waitForToolReady(page);
+  await page.locator('input[type="file"]').setInputFiles(await qrPngPath('TovolBox QR reader test'));
+  await expect(page.getByLabel('Output')).toContainText('TovolBox QR reader test');
 });
