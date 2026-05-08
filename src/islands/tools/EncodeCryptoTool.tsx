@@ -17,7 +17,15 @@ export default function EncodeCryptoTool({ component, title }: { component: stri
   const [input, setInput] = useState('hello');
   const [operation, setOperation] = useState('encode');
   const [asyncOutput, setAsyncOutput] = useState('');
-  useEffect(() => { if (!mode.startsWith('hash-')) return; const algorithm = mode === 'hash-sha1' ? 'SHA-1' : mode === 'hash-sha512' ? 'SHA-512' : 'SHA-256'; void hashText(input, algorithm).then(setAsyncOutput).catch((error: unknown) => setAsyncOutput(error instanceof Error ? error.message : 'Hash failed.')); }, [input, mode]);
+  useEffect(() => {
+    if (!mode.startsWith('hash-')) return;
+    let cancelled = false;
+    const algorithm = mode === 'hash-sha1' ? 'SHA-1' : mode === 'hash-sha512' ? 'SHA-512' : 'SHA-256';
+    void hashText(input, algorithm)
+      .then((result) => { if (!cancelled) setAsyncOutput(result); })
+      .catch((error: unknown) => { if (!cancelled) setAsyncOutput(error instanceof Error ? error.message : 'Hash failed.'); });
+    return () => { cancelled = true; };
+  }, [input, mode]);
   const output = useMemo(() => {
     try {
       if (mode === 'base64') return operation === 'encode' ? encodeBase64(input) : decodeBase64(input);
