@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeImageMode } from '@/islands/tools/ImageCanvasTool';
 import { selectQuizByComponent } from '@/islands/tools/ReflectionQuizTool';
-import { getToolRegistryKind } from '@/islands/tools/ToolRegistry';
+import { getToolRegistryKind } from '@/islands/tools/registryKind';
 
 describe('specialized tool modes', () => {
   it('maps quiz components to quiz ids', () => {

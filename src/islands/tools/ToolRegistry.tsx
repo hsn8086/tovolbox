@@ -1,14 +1,15 @@
-import ColorTool, { getColorMode } from './ColorTool';
-import DataTool, { getDataMode } from './DataTool';
-import DeveloperTool, { getDeveloperMode } from './DeveloperTool';
-import EncodeCryptoTool, { getEncodeCryptoMode } from './EncodeCryptoTool';
+import ColorTool from './ColorTool';
+import DataTool from './DataTool';
+import DeveloperTool from './DeveloperTool';
+import EncodeCryptoTool from './EncodeCryptoTool';
 import GenericTool from './GenericTool';
 import ImageCanvasTool from './ImageCanvasTool';
 import ReflectionQuizTool from './ReflectionQuizTool';
-import SeoTool, { getSeoMode } from './SeoTool';
-import SvgTool, { getSvgMode } from './SvgTool';
-import TextTool, { getTextMode } from './TextTool';
-import UnitConverterTool, { getUnitMode } from './UnitConverterTool';
+import SeoTool from './SeoTool';
+import SvgTool from './SvgTool';
+import TextTool from './TextTool';
+import UnitConverterTool from './UnitConverterTool';
+import { getToolRegistryKind } from './registryKind';
 
 type Props = {
   component: string;
@@ -17,23 +18,7 @@ type Props = {
   ymylDisclaimer: string;
 };
 
-const canvasTools = new Set(['image-resize-calculator', 'image-grayscale', 'image-rotate', 'image-flip', 'image-crop', 'image-brightness', 'image-contrast', 'image-saturation', 'image-watermark']);
-
-export type ToolRegistryKind = 'quiz' | 'image-canvas' | 'data' | 'text' | 'unit' | 'color' | 'encode-crypto' | 'seo' | 'developer' | 'svg' | 'generic';
-
-export function getToolRegistryKind(component: string): ToolRegistryKind {
-  if (component.startsWith('quiz-')) return 'quiz';
-  if (canvasTools.has(component)) return 'image-canvas';
-  if (getDataMode(component) !== 'generic') return 'data';
-  if (getTextMode(component) !== 'generic') return 'text';
-  if (getUnitMode(component) !== 'generic') return 'unit';
-  if (getColorMode(component) !== 'generic') return 'color';
-  if (getEncodeCryptoMode(component) !== 'generic') return 'encode-crypto';
-  if (getSeoMode(component) !== 'generic') return 'seo';
-  if (getDeveloperMode(component) !== 'generic') return 'developer';
-  if (getSvgMode(component) !== 'generic') return 'svg';
-  return 'generic';
-}
+export { getToolRegistryKind, type ToolRegistryKind } from './registryKind';
 
 export default function ToolRegistry({ component, title, privacyNote, ymylDisclaimer }: Props) {
   const kind = getToolRegistryKind(component);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { filterSearchItems, getCategoryFacets, getPopularItems, getRecentItems, getTagFacets, type SearchItem } from '@/lib/search/filter';
+import { buildSearchItems } from '@/lib/search/indexItems';
 
 const items: SearchItem[] = [
   {
@@ -75,5 +76,12 @@ describe('filterSearchItems', () => {
   it('returns popular and recent tool suggestions', () => {
     expect(getPopularItems(items, 2).map((item) => item.slug)).toEqual(['json-formatter', 'url-codec']);
     expect(getRecentItems(items, 2).map((item) => item.slug)).toEqual(['url-codec', 'json-formatter']);
+  });
+
+  it('builds locale-specific search items for SSR and JSON indexes', () => {
+    const searchItems = buildSearchItems('en');
+
+    expect(searchItems.some((item) => item.slug === 'json-formatter' && item.url === '/tools/json-formatter/')).toBe(true);
+    expect(searchItems.some((item) => item.type === 'category' && item.categorySlug === item.slug)).toBe(true);
   });
 });

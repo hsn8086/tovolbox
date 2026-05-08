@@ -4,22 +4,24 @@ import { filterSearchItems, getCategoryFacets, getPopularItems, getRecentItems, 
 
 type Props = {
   locale: string;
+  initialItems?: SearchItem[];
 };
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
-export default function SearchPage({ locale }: Props) {
+export default function SearchPage({ locale, initialItems = [] }: Props) {
   const copy = getSearchCopy(locale);
-  const [items, setItems] = useState<SearchItem[]>([]);
+  const hasInitialItems = initialItems.length > 0;
+  const [items, setItems] = useState<SearchItem[]>(initialItems);
   const [query, setQuery] = useState('');
   const [categorySlug, setCategorySlug] = useState('');
   const [activeTag, setActiveTag] = useState('');
-  const [loadState, setLoadState] = useState<LoadState>('idle');
+  const [loadState, setLoadState] = useState<LoadState>(hasInitialItems ? 'ready' : 'idle');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoadState('loading');
+    if (!hasInitialItems) setLoadState('loading');
 
     void fetch(`/search-index/${encodeURIComponent(locale)}.json`, { signal: controller.signal })
       .then((response) => {
@@ -32,12 +34,14 @@ export default function SearchPage({ locale }: Props) {
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return;
-        setItems([]);
-        setLoadState('error');
+        if (!hasInitialItems) {
+          setItems([]);
+          setLoadState('error');
+        }
       });
 
     return () => controller.abort();
-  }, [locale]);
+  }, [hasInitialItems, locale]);
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -62,6 +66,7 @@ export default function SearchPage({ locale }: Props) {
   const hasQuery = query.trim().length > 0;
   const hasActiveFilters = Boolean(categorySlug || activeTag);
   const showDiscovery = loadState === 'ready' && !hasQuery && !hasActiveFilters;
+  const showResults = loadState === 'ready' && !showDiscovery && resultCount > 0;
 
   function clearFilters() {
     setQuery('');
@@ -70,7 +75,7 @@ export default function SearchPage({ locale }: Props) {
   }
 
   return (
-    <section className="card" style={{ padding: '1.25rem' }}>
+    <section className="card" style={{ minHeight: '24rem', padding: '1.25rem' }}>
       <label style={{ display: 'block', marginBottom: '1rem' }}>
         {copy.label} <span style={{ color: 'var(--muted)', fontWeight: 500 }}>({copy.shortcutHint})</span>
         <input
@@ -116,7 +121,7 @@ export default function SearchPage({ locale }: Props) {
       <p id="search-result-summary" style={{ color: 'var(--muted)', margin: '0 0 1rem' }}>
         {loadState === 'loading' && copy.loading}
         {loadState === 'error' && copy.error}
-        {loadState === 'ready' && copy.resultSummary(resultCount, hasQuery ? query.trim() : '', activeTag, Boolean(categorySlug))}
+        {loadState === 'ready' && (showDiscovery ? copy.resultSummary(popularItems.length + recentItems.length, '', '', false) : copy.resultSummary(resultCount, hasQuery ? query.trim() : '', activeTag, Boolean(categorySlug)))}
       </p>
 
       {showDiscovery && (
@@ -126,12 +131,12 @@ export default function SearchPage({ locale }: Props) {
         </div>
       )}
 
-      {loadState === 'ready' && resultCount === 0 ? (
+      {loadState === 'ready' && !showDiscovery && resultCount === 0 ? (
         <div style={{ display: 'grid', gap: '1rem' }}>
           <p style={{ color: 'var(--muted)', margin: 0 }}>{copy.noResults}</p>
           <DiscoveryList title={copy.recommendedTools} items={suggestions} />
         </div>
-      ) : (
+      ) : showResults ? (
         <div className="grid-auto">
           {results.map((item) => (
             <a key={`${item.type ?? 'tool'}-${item.slug}`} className="card" href={item.url ?? `/tools/${item.slug}/`} style={{ display: 'block', padding: '1rem' }}>
@@ -141,7 +146,7 @@ export default function SearchPage({ locale }: Props) {
             </a>
           ))}
         </div>
-      )}
+      ) : null}
     </section>
   );
 }

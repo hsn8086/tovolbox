@@ -3,10 +3,12 @@ import SearchPage from '@/islands/search/SearchPage.tsx';
 import { localeCopy } from '@/data/locales';
 import { getPageCopy } from '@/data/pageCopy';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { buildSearchItems } from '@/lib/search/indexItems';
 const locale = 'en';
 const copy = localeCopy[locale];
 const pageCopy = getPageCopy(locale);
+const initialItems = buildSearchItems(locale);
 ---
 <BaseLayout locale={locale} title={`${pageCopy.searchTitle} | TovolBox`} description={pageCopy.searchDescription} route={{ locale, kind: 'search' }}>
-  <section class="container" style="padding: 3rem 0;"><h1>{copy.search}</h1><SearchPage client:load locale={locale} /></section>
+  <section class="container" style="padding: 3rem 0;"><h1>{copy.search}</h1><SearchPage client:load locale={locale} initialItems={initialItems} /></section>
 </BaseLayout>

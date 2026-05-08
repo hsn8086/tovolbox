@@ -1,7 +1,18 @@
 ---
-import ToolRegistry from '@/islands/tools/ToolRegistry.tsx';
 import type { Locale } from '@/data/locales';
 import { getPageCopy } from '@/data/pageCopy';
+import ColorTool from '@/islands/tools/ColorTool.tsx';
+import DataTool from '@/islands/tools/DataTool.tsx';
+import DeveloperTool from '@/islands/tools/DeveloperTool.tsx';
+import EncodeCryptoTool from '@/islands/tools/EncodeCryptoTool.tsx';
+import GenericTool from '@/islands/tools/GenericTool.tsx';
+import ImageCanvasTool from '@/islands/tools/ImageCanvasTool.tsx';
+import ReflectionQuizTool from '@/islands/tools/ReflectionQuizTool.tsx';
+import SeoTool from '@/islands/tools/SeoTool.tsx';
+import SvgTool from '@/islands/tools/SvgTool.tsx';
+import TextTool from '@/islands/tools/TextTool.tsx';
+import { getToolRegistryKind } from '@/islands/tools/registryKind';
+import UnitConverterTool from '@/islands/tools/UnitConverterTool.tsx';
 
 type Props = {
   component?: string;
@@ -11,10 +22,22 @@ type Props = {
 
 const { component, title, locale } = Astro.props;
 const pageCopy = getPageCopy(locale);
+const kind = component ? getToolRegistryKind(component) : undefined;
 ---
 
-{component ? <ToolRegistry client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} ymylDisclaimer={pageCopy.ymylDisclaimer} /> : (
+{component && kind === 'quiz' ? <ReflectionQuizTool client:load component={component} disclaimer={pageCopy.ymylDisclaimer} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{component && kind === 'image-canvas' ? <ImageCanvasTool client:load component={component} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{component && kind === 'data' ? <DataTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{component && kind === 'text' ? <TextTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{component && kind === 'unit' ? <UnitConverterTool client:load component={component} title={title} /> : null}
+{component && kind === 'color' ? <ColorTool client:load component={component} title={title} /> : null}
+{component && kind === 'encode-crypto' ? <EncodeCryptoTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{component && kind === 'seo' ? <SeoTool client:load component={component} title={title} /> : null}
+{component && kind === 'developer' ? <DeveloperTool client:load component={component} title={title} /> : null}
+{component && kind === 'svg' ? <SvgTool client:load component={component} title={title} /> : null}
+{component && kind === 'generic' ? <GenericTool client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} /> : null}
+{!component ? (
   <section class="card" style="padding: 1.25rem;">
     <p>{pageCopy.ymylDisclaimer}</p>
   </section>
-)}
+) : null}
