@@ -1,4 +1,14 @@
 import { expect, test } from '@playwright/test';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+function samplePngPath(): string {
+  const source = path.join(process.cwd(), 'tests/fixtures/sample.png.base64');
+  const target = path.join(os.tmpdir(), 'sample.png');
+  fs.writeFileSync(target, Buffer.from(fs.readFileSync(source, 'utf8').trim(), 'base64'));
+  return target;
+}
 
 test('search filters tools from the static index', async ({ page }) => {
   await page.goto('/search/');
@@ -44,4 +54,106 @@ test('image adjustment tools expose editable controls', async ({ page }) => {
   const cropTool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image crop/i }) });
   await cropTool.getByLabel(/Crop ratio/i).selectOption('16:9');
   await expect(cropTool.getByLabel(/Crop ratio/i)).toHaveValue('16:9');
+});
+
+test('image tools process uploaded fixtures and expose output controls', async ({ page }) => {
+  await page.goto('/tools/image-resize-calculator/');
+  const tool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image resizer/i }) });
+  await tool.getByLabel(/Upload image/i).setInputFiles(samplePngPath());
+  const sourceDetails = tool.locator('p').filter({ hasText: /Source:/i });
+  await expect(sourceDetails).toContainText('sample.png');
+  await expect(sourceDetails).toContainText('4x3');
+  await tool.getByLabel(/Output format/i).selectOption('image/jpeg');
+  await expect(tool.getByLabel(/Quality/i)).toBeVisible();
+  await tool.getByLabel(/Quality/i).fill('0.7');
+  await expect(tool.locator('p').filter({ hasText: /Output:/i })).toContainText('JPEG');
+  await expect(tool.getByRole('button', { name: /Download JPEG/i })).toBeEnabled();
+
+  await page.goto('/tools/add-text-watermark/');
+  const watermarkTool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image watermark/i }) });
+  await expect(watermarkTool.getByLabel(/Watermark position/i)).toBeVisible();
+  await watermarkTool.getByLabel(/Watermark position/i).selectOption('center');
+  await watermarkTool.getByLabel(/Font size/i).fill('24');
+  await watermarkTool.getByLabel(/Watermark color/i).fill('#ff0000');
+});
+
+test('SEO generators expose dedicated fields and outputs', async ({ page }) => {
+  await page.goto('/tools/utm-builder/');
+  await page.getByLabel('Campaign source').fill('organic');
+  await page.getByLabel('Campaign medium').fill('social');
+  await page.getByLabel('Campaign name').fill('spring launch');
+  await expect(page.getByLabel('Output')).toContainText('utm_source=organic');
+  await expect(page.getByLabel('Output')).toContainText('utm_medium=social');
+  await expect(page.getByLabel('Output')).toContainText('utm_campaign=spring+launch');
+
+  await page.goto('/tools/hreflang-tag-generator/');
+  await page.getByLabel('Hreflang rows').fill('en|https://example.com/\nfr|https://example.com/fr/');
+  await expect(page.getByLabel('Output')).toContainText('hreflang="fr"');
+
+  await page.goto('/tools/robots-txt-generator/');
+  await page.getByLabel('Disallow paths').fill('/admin/\n/private/');
+  await expect(page.getByLabel('Output')).toContainText('Disallow: /admin/');
+  await expect(page.getByLabel('Output')).toContainText('Disallow: /private/');
+
+  await page.goto('/tools/faq-schema-generator/');
+  await page.getByLabel('FAQ rows').fill('Is it local?|Whenever possible.');
+  await expect(page.getByLabel('Output')).toContainText('FAQPage');
+  await expect(page.getByLabel('Output')).toContainText('Is it local?');
+
+  await page.goto('/tools/breadcrumb-schema-generator/');
+  await page.getByLabel('Breadcrumb rows').fill('Home|https://example.com/\nTools|https://example.com/tools/');
+  await expect(page.getByLabel('Output')).toContainText('BreadcrumbList');
+  await expect(page.getByLabel('Output')).toContainText('"position": 2');
+});
+
+test('calculator tools expose dedicated numeric fields and readable outputs', async ({ page }) => {
+  await page.goto('/tools/percentage-calculator/');
+  await page.getByLabel('Value').fill('30');
+  await page.getByLabel('Total').fill('120');
+  await expect(page.getByLabel('Output')).toContainText('25%');
+
+  await page.goto('/tools/percentage-change-calculator/');
+  await page.getByLabel('Previous value').fill('80');
+  await page.getByLabel('Current value').fill('100');
+  await expect(page.getByLabel('Output')).toContainText('+25%');
+
+  await page.goto('/tools/discount-calculator/');
+  await page.getByLabel('Original price').fill('80');
+  await page.getByLabel('Discount percent').fill('25');
+  await expect(page.getByLabel('Output')).toContainText('Final price: 60.00');
+  await expect(page.getByLabel('Output')).toContainText('You save: 20.00');
+
+  await page.goto('/tools/loan-payment-calculator/');
+  await page.getByLabel('Principal').fill('12000');
+  await page.getByLabel('Annual rate').fill('0');
+  await page.getByLabel('Years').fill('1');
+  await page.getByLabel('Payments per year').fill('12');
+  await expect(page.getByLabel('Output')).toContainText('Payment per period: 1000.00');
+
+  await page.goto('/tools/compound-interest-calculator/');
+  await page.getByLabel('Principal').fill('1000');
+  await page.getByLabel('Annual rate').fill('5');
+  await page.getByLabel('Years').fill('10');
+  await page.getByLabel('Compounds per year').fill('1');
+  await expect(page.getByLabel('Output')).toContainText('Final amount: 1628.89');
+});
+
+test('developer tools expose dedicated regex cron and base fields', async ({ page }) => {
+  await page.goto('/tools/regex-tester/');
+  await page.getByLabel('Pattern').fill('(?<key>\\w+)=(\\d+)');
+  await page.getByLabel('Flags').fill('g');
+  await page.getByLabel('Test text').fill('a=1 b=22');
+  await expect(page.getByLabel('Output')).toContainText('"value": "a=1"');
+  await expect(page.getByLabel('Output')).toContainText('"key": "b"');
+
+  await page.goto('/tools/cron-expression-explainer/');
+  await page.getByLabel('Cron expression').fill('*/15 9-17 1,15 * 1-5');
+  await expect(page.getByLabel('Output')).toContainText('every 15 minutes');
+  await expect(page.getByLabel('Output')).toContainText('from hour 9 through 17');
+
+  await page.goto('/tools/number-base-converter/');
+  await page.getByLabel('Value').fill('1010');
+  await page.getByLabel('From base').fill('2');
+  await page.getByLabel('To base').fill('10');
+  await expect(page.getByLabel('Output')).toContainText('10');
 });

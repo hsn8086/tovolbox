@@ -14,7 +14,7 @@ export function getEncodeCryptoMode(component: string): string {
 
 export default function EncodeCryptoTool({ component, title }: { component: string; title: string }) {
   const mode = getEncodeCryptoMode(component);
-  const [input, setInput] = useState('hello');
+  const [input, setInput] = useState(mode.startsWith('hash-') ? '' : 'hello');
   const [operation, setOperation] = useState('encode');
   const [asyncOutput, setAsyncOutput] = useState('');
   useEffect(() => {

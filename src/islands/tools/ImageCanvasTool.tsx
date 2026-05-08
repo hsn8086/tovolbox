@@ -1,34 +1,79 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { CSSProperties, Dispatch, SetStateAction } from 'react';
-import { calculateCropRect } from '@/lib/tools/image';
+import { calculateCropRect, calculateResizeDimensions, formatBytes, imageMimeToExtension, type ResizeFit } from '@/lib/tools/image';
 
 type Props = {
   component: string;
 };
 
 export type ImageCanvasMode = 'inspect' | 'resizer' | 'crop' | 'grayscale' | 'rotate' | 'flip' | 'brightness' | 'contrast' | 'saturation' | 'watermark';
+export type ImageOutputFormat = 'image/png' | 'image/jpeg' | 'image/webp';
+export type WatermarkPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center';
 
 export type ImageCanvasSettings = {
   resizeWidth: number;
-  cropRatio: '1:1' | '16:9' | '4:5' | '9:16';
+  resizeHeight: number;
+  resizeKeepRatio: boolean;
+  resizeFit: ResizeFit;
+  cropRatio: '1:1' | '16:9' | '4:5' | '9:16' | 'custom';
+  cropCustomWidth: number;
+  cropCustomHeight: number;
+  cropOffsetX: number;
+  cropOffsetY: number;
   rotationDegrees: 0 | 90 | 180 | 270;
   flipAxis: 'horizontal' | 'vertical';
   brightness: number;
   contrast: number;
   saturation: number;
   watermarkText: string;
+  watermarkPosition: WatermarkPosition;
+  watermarkFontSize: number;
+  watermarkColor: string;
+  watermarkOpacity: number;
+  outputFormat: ImageOutputFormat;
+  outputQuality: number;
+};
+
+type ImageFileInfo = {
+  name: string;
+  type: string;
+  size: number;
+  width: number;
+  height: number;
+};
+
+type ImageOutputInfo = {
+  width: number;
+  height: number;
+  format: ImageOutputFormat;
+  size: number;
 };
 
 const defaultSettings: ImageCanvasSettings = {
   resizeWidth: 800,
+  resizeHeight: 800,
+  resizeKeepRatio: true,
+  resizeFit: 'contain',
   cropRatio: '1:1',
+  cropCustomWidth: 1,
+  cropCustomHeight: 1,
+  cropOffsetX: 0,
+  cropOffsetY: 0,
   rotationDegrees: 90,
   flipAxis: 'horizontal',
   brightness: 32,
   contrast: 1.28,
   saturation: 1.45,
   watermarkText: 'TovolBox',
+  watermarkPosition: 'bottom-right',
+  watermarkFontSize: 32,
+  watermarkColor: '#ffffff',
+  watermarkOpacity: 0.82,
+  outputFormat: 'image/png',
+  outputQuality: 0.92,
 };
+
+const outputFormats: ImageOutputFormat[] = ['image/png', 'image/jpeg', 'image/webp'];
 
 export function normalizeImageMode(component: string): ImageCanvasMode {
   if (component.includes('resize')) return 'resizer';
@@ -47,11 +92,30 @@ export function getDefaultImageSettings(): ImageCanvasSettings {
   return { ...defaultSettings };
 }
 
-export function cropRatioToNumber(ratio: ImageCanvasSettings['cropRatio']): number {
+export function cropRatioToNumber(ratio: ImageCanvasSettings['cropRatio'], customWidth = 1, customHeight = 1): number {
   if (ratio === '16:9') return 16 / 9;
   if (ratio === '4:5') return 4 / 5;
   if (ratio === '9:16') return 9 / 16;
+  if (ratio === 'custom') return customWidth > 0 && customHeight > 0 ? customWidth / customHeight : 1;
   return 1;
+}
+
+export function outputFormatLabel(format: ImageOutputFormat): string {
+  return format === 'image/jpeg' ? 'JPEG' : format === 'image/webp' ? 'WebP' : 'PNG';
+}
+
+export function imageOutputExtension(format: ImageOutputFormat): string {
+  return format === 'image/jpeg' ? 'jpg' : imageMimeToExtension(format);
+}
+
+export function normalizeImageQuality(value: number): number {
+  if (!Number.isFinite(value)) return defaultSettings.outputQuality;
+  return Math.max(0.1, Math.min(1, value));
+}
+
+export function normalizeCropOffset(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(-100, Math.min(100, Math.round(value)));
 }
 
 export function applyImageAdjustment(value: number, mode: ImageCanvasMode, settings: Partial<ImageCanvasSettings> = {}): number {
@@ -72,6 +136,8 @@ export default function ImageCanvasTool({ component }: Props) {
   const fileInputId = useId();
   const [settings, setSettings] = useState<ImageCanvasSettings>(() => getDefaultImageSettings());
   const [hasImage, setHasImage] = useState(false);
+  const [fileInfo, setFileInfo] = useState<ImageFileInfo | null>(null);
+  const [outputInfo, setOutputInfo] = useState<ImageOutputInfo | null>(null);
   const [message, setMessage] = useState('Choose an image. Processing stays in your browser.');
 
   useEffect(() => {
@@ -85,13 +151,14 @@ export default function ImageCanvasTool({ component }: Props) {
     if (!ctx) return;
 
     const isCropped = mode === 'crop';
-    const crop = isCropped ? calculateCropRect(image.naturalWidth, image.naturalHeight, cropRatioToNumber(activeSettings.cropRatio)) : null;
+    const crop = isCropped ? getCropRect(image.naturalWidth, image.naturalHeight, activeSettings) : null;
     const sourceX = crop?.x ?? 0;
     const sourceY = crop?.y ?? 0;
     const sourceWidth = crop?.width ?? image.naturalWidth;
     const sourceHeight = crop?.height ?? image.naturalHeight;
-    const targetWidth = mode === 'resizer' ? Math.min(activeSettings.resizeWidth, sourceWidth) : sourceWidth;
-    const targetHeight = mode === 'resizer' ? Math.round((targetWidth / sourceWidth) * sourceHeight) : sourceHeight;
+    const resize = mode === 'resizer' ? getResizeDimensions(sourceWidth, sourceHeight, activeSettings) : { width: sourceWidth, height: sourceHeight };
+    const targetWidth = resize.width;
+    const targetHeight = resize.height;
     const swapsRotation = mode === 'rotate' && activeSettings.rotationDegrees % 180 !== 0;
     canvas.width = swapsRotation ? targetHeight : targetWidth;
     canvas.height = swapsRotation ? targetWidth : targetHeight;
@@ -128,19 +195,19 @@ export default function ImageCanvasTool({ component }: Props) {
 
     if (mode === 'watermark') {
       ctx.save();
-      ctx.font = `${Math.max(18, Math.round(canvas.width / 22))}px sans-serif`;
-      ctx.fillStyle = 'rgba(255,255,255,.82)';
+      ctx.font = `${activeSettings.watermarkFontSize}px sans-serif`;
+      ctx.fillStyle = hexToRgba(activeSettings.watermarkColor, activeSettings.watermarkOpacity);
       ctx.strokeStyle = 'rgba(15,23,42,.7)';
       ctx.lineWidth = 3;
       const text = activeSettings.watermarkText.trim() || 'TovolBox';
-      const x = Math.max(16, canvas.width - ctx.measureText(text).width - 24);
-      const y = Math.max(32, canvas.height - 24);
+      const { x, y } = getWatermarkPoint(ctx, text, canvas.width, canvas.height, activeSettings);
       ctx.strokeText(text, x, y);
       ctx.fillText(text, x, y);
       ctx.restore();
     }
 
     setMessage(`${image.naturalWidth}x${image.naturalHeight} processed as ${canvas.width}x${canvas.height}.`);
+    updateOutputInfo(canvas, activeSettings, setOutputInfo);
   }
 
   function handleFile(file: File) {
@@ -148,12 +215,15 @@ export default function ImageCanvasTool({ component }: Props) {
     const url = URL.createObjectURL(file);
     image.onload = () => {
       imageRef.current = image;
+      setFileInfo({ name: file.name, type: file.type || 'image/*', size: file.size, width: image.naturalWidth, height: image.naturalHeight });
       setHasImage(true);
       drawImage(image, settings);
       URL.revokeObjectURL(url);
     };
     image.onerror = () => {
       setHasImage(false);
+      setFileInfo(null);
+      setOutputInfo(null);
       setMessage('Could not load this image. Try a PNG, JPEG, WebP, or GIF file.');
       URL.revokeObjectURL(url);
     };
@@ -164,8 +234,8 @@ export default function ImageCanvasTool({ component }: Props) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `tovolbox-${mode}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.download = `tovolbox-${mode}.${imageOutputExtension(settings.outputFormat)}`;
+    link.href = canvas.toDataURL(settings.outputFormat, settings.outputQuality);
     link.click();
   }
 
@@ -176,9 +246,11 @@ export default function ImageCanvasTool({ component }: Props) {
       <label htmlFor={fileInputId} style={{ display: 'block', fontWeight: 800, marginBottom: '.45rem' }}>Upload image</label>
       <input id={fileInputId} className="input" type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && handleFile(event.target.files[0])} />
       <ImageControls mode={mode} settings={settings} setSettings={setSettings} />
+      <ImageOutputControls settings={settings} setSettings={setSettings} />
       <p>{message}</p>
+      <ImageDetails fileInfo={fileInfo} outputInfo={outputInfo} />
       <canvas ref={canvasRef} style={{ maxWidth: '100%', border: '1px solid var(--border)', borderRadius: '1rem', background: 'white' }} />
-      <div style={{ marginTop: '1rem' }}><button className="btn" type="button" onClick={download} disabled={!hasImage}>Download PNG</button></div>
+      <div style={{ marginTop: '1rem' }}><button className="btn" type="button" onClick={download} disabled={!hasImage}>Download {outputFormatLabel(settings.outputFormat)}</button></div>
     </section>
   );
 }
@@ -195,9 +267,24 @@ function ImageControls({ mode, settings, setSettings }: {
   if (mode === 'resizer') {
     return (
       <div style={controlGroupStyle}>
-        <label style={controlLabelStyle}>Max width
+        <label style={controlLabelStyle}>Target width
           <input className="input" type="number" min="64" max="4096" value={settings.resizeWidth} onChange={(event) => update({ resizeWidth: normalizeResizeWidth(event.target.valueAsNumber) })} />
         </label>
+        <label style={controlLabelStyle}>Target height
+          <input className="input" type="number" min="64" max="4096" value={settings.resizeHeight} onChange={(event) => update({ resizeHeight: normalizeResizeWidth(event.target.valueAsNumber) })} disabled={settings.resizeKeepRatio} />
+        </label>
+        <label style={{ ...controlLabelStyle, display: 'flex', alignItems: 'center' }}>
+          <input type="checkbox" checked={settings.resizeKeepRatio} onChange={(event) => update({ resizeKeepRatio: event.target.checked })} /> Keep aspect ratio
+        </label>
+        {!settings.resizeKeepRatio && (
+          <label style={controlLabelStyle}>Fit mode
+            <select className="input" value={settings.resizeFit} onChange={(event) => update({ resizeFit: event.target.value as ResizeFit })}>
+              <option value="contain">Contain</option>
+              <option value="cover">Cover</option>
+              <option value="stretch">Stretch</option>
+            </select>
+          </label>
+        )}
       </div>
     );
   }
@@ -211,8 +298,21 @@ function ImageControls({ mode, settings, setSettings }: {
             <option value="16:9">Landscape 16:9</option>
             <option value="4:5">Portrait 4:5</option>
             <option value="9:16">Story 9:16</option>
+            <option value="custom">Custom</option>
           </select>
         </label>
+        {settings.cropRatio === 'custom' && (
+          <>
+            <label style={controlLabelStyle}>Custom ratio width
+              <input className="input" type="number" min="1" max="100" value={settings.cropCustomWidth} onChange={(event) => update({ cropCustomWidth: normalizePositiveNumber(event.target.valueAsNumber, 1) })} />
+            </label>
+            <label style={controlLabelStyle}>Custom ratio height
+              <input className="input" type="number" min="1" max="100" value={settings.cropCustomHeight} onChange={(event) => update({ cropCustomHeight: normalizePositiveNumber(event.target.valueAsNumber, 1) })} />
+            </label>
+          </>
+        )}
+        <SliderControl label="Crop horizontal offset" min={-100} max={100} step={1} value={settings.cropOffsetX} display={`${settings.cropOffsetX}%`} onChange={(cropOffsetX) => update({ cropOffsetX: normalizeCropOffset(cropOffsetX) })} />
+        <SliderControl label="Crop vertical offset" min={-100} max={100} step={1} value={settings.cropOffsetY} display={`${settings.cropOffsetY}%`} onChange={(cropOffsetY) => update({ cropOffsetY: normalizeCropOffset(cropOffsetY) })} />
       </div>
     );
   }
@@ -263,11 +363,59 @@ function ImageControls({ mode, settings, setSettings }: {
         <label style={controlLabelStyle}>Watermark text
           <input className="input" value={settings.watermarkText} onChange={(event) => update({ watermarkText: event.target.value })} />
         </label>
+        <label style={controlLabelStyle}>Watermark position
+          <select className="input" value={settings.watermarkPosition} onChange={(event) => update({ watermarkPosition: event.target.value as WatermarkPosition })}>
+            <option value="bottom-right">Bottom right</option>
+            <option value="bottom-left">Bottom left</option>
+            <option value="top-right">Top right</option>
+            <option value="top-left">Top left</option>
+            <option value="center">Center</option>
+          </select>
+        </label>
+        <label style={controlLabelStyle}>Font size
+          <input className="input" type="number" min="12" max="160" value={settings.watermarkFontSize} onChange={(event) => update({ watermarkFontSize: normalizeWatermarkFontSize(event.target.valueAsNumber) })} />
+        </label>
+        <label style={controlLabelStyle}>Watermark color
+          <input className="input" type="color" value={settings.watermarkColor} onChange={(event) => update({ watermarkColor: event.target.value })} />
+        </label>
+        <SliderControl label="Watermark opacity" min={0.1} max={1} step={0.05} value={settings.watermarkOpacity} display={`${Math.round(settings.watermarkOpacity * 100)}%`} onChange={(watermarkOpacity) => update({ watermarkOpacity: normalizeImageQuality(watermarkOpacity) })} />
       </div>
     );
   }
 
   return null;
+}
+
+function ImageOutputControls({ settings, setSettings }: {
+  settings: ImageCanvasSettings;
+  setSettings: Dispatch<SetStateAction<ImageCanvasSettings>>;
+}) {
+  function update(next: Partial<ImageCanvasSettings>) {
+    setSettings((current) => ({ ...current, ...next }));
+  }
+
+  return (
+    <div style={controlGroupStyle}>
+      <label style={controlLabelStyle}>Output format
+        <select className="input" value={settings.outputFormat} onChange={(event) => update({ outputFormat: event.target.value as ImageOutputFormat })}>
+          {outputFormats.map((format) => <option key={format} value={format}>{outputFormatLabel(format)}</option>)}
+        </select>
+      </label>
+      {settings.outputFormat !== 'image/png' && (
+        <SliderControl label="Quality" min={0.1} max={1} step={0.01} value={settings.outputQuality} display={`${Math.round(settings.outputQuality * 100)}%`} onChange={(outputQuality) => update({ outputQuality: normalizeImageQuality(outputQuality) })} />
+      )}
+    </div>
+  );
+}
+
+function ImageDetails({ fileInfo, outputInfo }: { fileInfo: ImageFileInfo | null; outputInfo: ImageOutputInfo | null }) {
+  if (!fileInfo) return null;
+  return (
+    <div style={{ color: 'var(--muted)', display: 'grid', gap: '.25rem', marginBottom: '1rem' }} aria-live="polite">
+      <p style={{ margin: 0 }}><strong>Source:</strong> {fileInfo.name} · {fileInfo.type} · {formatBytes(fileInfo.size)} · {fileInfo.width}x{fileInfo.height}</p>
+      {outputInfo && <p style={{ margin: 0 }}><strong>Output:</strong> {outputInfo.width}x{outputInfo.height} · {outputFormatLabel(outputInfo.format)} · about {formatBytes(outputInfo.size)}</p>}
+    </div>
+  );
 }
 
 function SliderControl({ label, min, max, step, value, display, onChange }: {
@@ -311,9 +459,75 @@ function applyCanvasTransform(ctx: CanvasRenderingContext2D, mode: ImageCanvasMo
   }
 }
 
+function getResizeDimensions(sourceWidth: number, sourceHeight: number, settings: ImageCanvasSettings) {
+  if (settings.resizeKeepRatio) {
+    const width = normalizeResizeWidth(settings.resizeWidth);
+    return { width, height: Math.max(1, Math.round((width / sourceWidth) * sourceHeight)) };
+  }
+
+  return calculateResizeDimensions(sourceWidth, sourceHeight, normalizeResizeWidth(settings.resizeWidth), normalizeResizeWidth(settings.resizeHeight), settings.resizeFit);
+}
+
+function getCropRect(sourceWidth: number, sourceHeight: number, settings: ImageCanvasSettings) {
+  const rect = calculateCropRect(sourceWidth, sourceHeight, cropRatioToNumber(settings.cropRatio, settings.cropCustomWidth, settings.cropCustomHeight));
+  const freeX = sourceWidth - rect.width;
+  const freeY = sourceHeight - rect.height;
+  return {
+    ...rect,
+    x: clampRange(rect.x + Math.round((settings.cropOffsetX / 100) * (freeX / 2)), 0, freeX),
+    y: clampRange(rect.y + Math.round((settings.cropOffsetY / 100) * (freeY / 2)), 0, freeY),
+  };
+}
+
+function updateOutputInfo(canvas: HTMLCanvasElement, settings: ImageCanvasSettings, setOutputInfo: Dispatch<SetStateAction<ImageOutputInfo | null>>) {
+  const next = { width: canvas.width, height: canvas.height, format: settings.outputFormat };
+  canvas.toBlob((blob) => {
+    const size = blob?.size ?? estimateDataUrlBytes(canvas.toDataURL(settings.outputFormat, settings.outputQuality));
+    setOutputInfo({ ...next, size });
+  }, settings.outputFormat, settings.outputQuality);
+}
+
+function estimateDataUrlBytes(dataUrl: string): number {
+  const base64 = dataUrl.split(',')[1] ?? '';
+  return Math.max(0, Math.round((base64.length * 3) / 4));
+}
+
+function getWatermarkPoint(ctx: CanvasRenderingContext2D, text: string, width: number, height: number, settings: ImageCanvasSettings) {
+  const padding = Math.max(12, Math.round(settings.watermarkFontSize * 0.75));
+  const textWidth = ctx.measureText(text).width;
+  const textHeight = settings.watermarkFontSize;
+  if (settings.watermarkPosition === 'bottom-left') return { x: padding, y: height - padding };
+  if (settings.watermarkPosition === 'top-right') return { x: Math.max(padding, width - textWidth - padding), y: padding + textHeight };
+  if (settings.watermarkPosition === 'top-left') return { x: padding, y: padding + textHeight };
+  if (settings.watermarkPosition === 'center') return { x: Math.max(padding, (width - textWidth) / 2), y: Math.max(textHeight, (height + textHeight) / 2) };
+  return { x: Math.max(padding, width - textWidth - padding), y: height - padding };
+}
+
+function hexToRgba(hex: string, opacity: number): string {
+  const normalized = /^#[\da-f]{6}$/i.test(hex) ? hex.slice(1) : 'ffffff';
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${normalizeImageQuality(opacity)})`;
+}
+
 function normalizeResizeWidth(value: number): number {
   if (!Number.isFinite(value)) return defaultSettings.resizeWidth;
   return Math.max(64, Math.min(4096, Math.round(value)));
+}
+
+function normalizePositiveNumber(value: number, fallback: number): number {
+  if (!Number.isFinite(value) || value <= 0) return fallback;
+  return Math.round(value * 100) / 100;
+}
+
+function normalizeWatermarkFontSize(value: number): number {
+  if (!Number.isFinite(value)) return defaultSettings.watermarkFontSize;
+  return Math.max(12, Math.min(160, Math.round(value)));
+}
+
+function clampRange(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 const controlGroupStyle: CSSProperties = { margin: '1rem 0', display: 'grid', gap: '.75rem' };
