@@ -29,5 +29,19 @@ test('image canvas tool loads local processing UI', async ({ page }) => {
   const tool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image grayscale/i }) });
   await expect(tool).toBeVisible();
   await expect(tool.getByText(/processed locally/i)).toBeVisible();
-  await expect(tool.getByRole('button', { name: /Download PNG/i })).toBeVisible();
+  await expect(tool.getByLabel(/Upload image/i)).toBeVisible();
+  await expect(tool.getByRole('button', { name: /Download PNG/i })).toBeDisabled();
+});
+
+test('image adjustment tools expose editable controls', async ({ page }) => {
+  await page.goto('/tools/image-brightness-adjuster/');
+  const brightnessTool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image brightness/i }) });
+  await expect(brightnessTool.getByLabel(/Brightness/i)).toBeVisible();
+  await brightnessTool.getByLabel(/Brightness/i).fill('12');
+  await expect(brightnessTool.getByText(/Brightness:\s+\+12/i)).toBeVisible();
+
+  await page.goto('/tools/image-crop/');
+  const cropTool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image crop/i }) });
+  await cropTool.getByLabel(/Crop ratio/i).selectOption('16:9');
+  await expect(cropTool.getByLabel(/Crop ratio/i)).toHaveValue('16:9');
 });

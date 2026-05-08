@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyImageAdjustment, normalizeImageMode } from '@/islands/tools/ImageCanvasTool';
+import { applyImageAdjustment, applySaturationChannel, cropRatioToNumber, getDefaultImageSettings, normalizeImageMode } from '@/islands/tools/ImageCanvasTool';
 
 describe('image canvas tool helpers', () => {
   it('normalizes component names into canvas modes', () => {
@@ -21,5 +21,24 @@ describe('image canvas tool helpers', () => {
     expect(applyImageAdjustment(100, 'contrast')).toBe(92);
     expect(applyImageAdjustment(300, 'contrast')).toBe(255);
     expect(applyImageAdjustment(-20, 'inspect')).toBe(0);
+  });
+
+  it('uses custom image settings for pixel adjustments', () => {
+    expect(applyImageAdjustment(100, 'brightness', { brightness: -40 })).toBe(60);
+    expect(applyImageAdjustment(100, 'contrast', { contrast: 2 })).toBe(72);
+    expect(applySaturationChannel(150, 100, 0)).toBe(100);
+    expect(applySaturationChannel(150, 100, 2)).toBe(200);
+  });
+
+  it('maps crop ratios and returns independent default settings', () => {
+    expect(cropRatioToNumber('16:9')).toBeCloseTo(16 / 9);
+    expect(cropRatioToNumber('4:5')).toBeCloseTo(4 / 5);
+    expect(cropRatioToNumber('9:16')).toBeCloseTo(9 / 16);
+    expect(cropRatioToNumber('1:1')).toBe(1);
+
+    const first = getDefaultImageSettings();
+    const second = getDefaultImageSettings();
+    first.watermarkText = 'Changed';
+    expect(second.watermarkText).toBe('TovolBox');
   });
 });
