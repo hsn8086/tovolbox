@@ -17,16 +17,34 @@ type Props = {
 
 const canvasTools = new Set(['image-resize-calculator', 'image-grayscale', 'image-rotate', 'image-flip', 'image-crop', 'image-brightness', 'image-contrast', 'image-saturation', 'image-watermark']);
 
+export type ToolRegistryKind = 'quiz' | 'image-canvas' | 'data' | 'text' | 'unit' | 'color' | 'encode-crypto' | 'seo' | 'developer' | 'svg' | 'generic';
+
+export function getToolRegistryKind(component: string): ToolRegistryKind {
+  if (component.startsWith('quiz-')) return 'quiz';
+  if (canvasTools.has(component)) return 'image-canvas';
+  if (getDataMode(component) !== 'generic') return 'data';
+  if (getTextMode(component) !== 'generic') return 'text';
+  if (getUnitMode(component) !== 'generic') return 'unit';
+  if (getColorMode(component) !== 'generic') return 'color';
+  if (getEncodeCryptoMode(component) !== 'generic') return 'encode-crypto';
+  if (getSeoMode(component) !== 'generic') return 'seo';
+  if (getDeveloperMode(component) !== 'generic') return 'developer';
+  if (getSvgMode(component) !== 'generic') return 'svg';
+  return 'generic';
+}
+
 export default function ToolRegistry({ component, title }: Props) {
-  if (component.startsWith('quiz-')) return <ReflectionQuizTool component={component} />;
-  if (canvasTools.has(component)) return <ImageCanvasTool component={component} />;
-  if (getDataMode(component) !== 'generic') return <DataTool component={component} title={title} />;
-  if (getTextMode(component) !== 'generic') return <TextTool component={component} title={title} />;
-  if (getUnitMode(component) !== 'generic') return <UnitConverterTool component={component} title={title} />;
-  if (getColorMode(component) !== 'generic') return <ColorTool component={component} title={title} />;
-  if (getEncodeCryptoMode(component) !== 'generic') return <EncodeCryptoTool component={component} title={title} />;
-  if (getSeoMode(component) !== 'generic') return <SeoTool component={component} title={title} />;
-  if (getDeveloperMode(component) !== 'generic') return <DeveloperTool component={component} title={title} />;
-  if (getSvgMode(component) !== 'generic') return <SvgTool component={component} title={title} />;
+  const kind = getToolRegistryKind(component);
+
+  if (kind === 'quiz') return <ReflectionQuizTool component={component} />;
+  if (kind === 'image-canvas') return <ImageCanvasTool component={component} />;
+  if (kind === 'data') return <DataTool component={component} title={title} />;
+  if (kind === 'text') return <TextTool component={component} title={title} />;
+  if (kind === 'unit') return <UnitConverterTool component={component} title={title} />;
+  if (kind === 'color') return <ColorTool component={component} title={title} />;
+  if (kind === 'encode-crypto') return <EncodeCryptoTool component={component} title={title} />;
+  if (kind === 'seo') return <SeoTool component={component} title={title} />;
+  if (kind === 'developer') return <DeveloperTool component={component} title={title} />;
+  if (kind === 'svg') return <SvgTool component={component} title={title} />;
   return <GenericTool component={component} title={title} />;
 }

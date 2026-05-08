@@ -17,5 +17,8 @@ describe('localized routing', () => {
     const links = getHreflangLinks({ kind: 'tool', slug: 'json-formatter' });
     expect(links).toHaveLength(12);
     expect(links[0]).toEqual({ hreflang: 'x-default', href: 'https://tovolbox.hsn8086.com/tools/json-formatter/' });
+    expect(links).toContainEqual({ hreflang: 'zh-CN', href: 'https://tovolbox.hsn8086.com/zh-CN/tools/json-formatter/' });
+    expect(links).toContainEqual({ hreflang: 'ar', href: 'https://tovolbox.hsn8086.com/ar/tools/json-formatter/' });
+    expect(links.some((link) => link.href.includes('/en/'))).toBe(false);
   });
 });
