@@ -9,7 +9,9 @@
     "preview": "astro preview",
     "check": "astro check && tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify": "npm run test && npm run check && npm run build && npm run test:e2e",
+    "deploy": "npm run build && bunx wrangler@4.90.0 pages deploy dist --project-name=tovolbox --branch=main"
   },
   "dependencies": {
     "@astrojs/react": "latest",

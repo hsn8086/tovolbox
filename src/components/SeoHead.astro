@@ -15,6 +15,7 @@ const alternates = getHreflangLinks({ kind: route.kind, slug: route.slug }, Astr
 
 <title>{title}</title>
 <meta name="description" content={description} />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="canonical" href={canonical} />
 {alternates.map((item) => <link rel="alternate" hreflang={item.hreflang} href={item.href} />)}
 <meta property="og:type" content="website" />
