@@ -1,5 +1,10 @@
 import type { LocalizedFaq } from '@/data/types';
 
+export type BreadcrumbJsonLdItem = {
+  name: string;
+  url: string;
+};
+
 export function websiteJsonLd(site = 'https://tovolbox.hsn8086.com') {
   return {
     '@context': 'https://schema.org',
@@ -36,5 +41,18 @@ export function toolJsonLd(name: string, description: string, url: string) {
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Any',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+}
+
+export function breadcrumbJsonLd(items: BreadcrumbJsonLdItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
   };
 }

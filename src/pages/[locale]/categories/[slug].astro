@@ -1,14 +1,23 @@
 ---
 import ToolCard from '@/components/ToolCard.astro';
 import { categories, getToolsByCategory } from '@/data/content';
-import { locales, type Locale } from '@/data/locales';
+import { localeCopy, locales, type Locale } from '@/data/locales';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLocalizedPath } from '@/lib/i18n/routing';
 export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').flatMap((locale) => categories.map((category) => ({ params: { locale, slug: category.slug } }))); }
 const locale = Astro.params.locale as Locale;
 const category = categories.find((item) => item.slug === Astro.params.slug)!;
 const seo = category.seo[locale];
+const copy = localeCopy[locale];
 const categoryTools = getToolsByCategory(category.slug);
+const featuredTools = categoryTools.slice(0, 6);
+const liveCount = categoryTools.filter((tool) => tool.status === 'live').length;
 ---
 <BaseLayout locale={locale} title={seo.title} description={seo.description} route={{ locale, kind: 'category', slug: category.slug }}>
-  <section class="container" style="padding: 3rem 0;"><span class="badge">Category</span><h1>{seo.h1}</h1><p style="color: var(--muted); max-width: 760px; line-height: 1.7;">{seo.intro}</p><div class="grid-auto" style="margin-top: 1.5rem;">{categoryTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}</div></section>
+  <section class="container" style="padding: 3rem 0; display: grid; gap: 1.25rem;">
+    <div><span class="badge">Category</span><h1>{seo.h1}</h1><p style="color: var(--muted); max-width: 760px; line-height: 1.7;">{seo.intro}</p></div>
+    <section class="card" style="padding: 1.25rem;"><h2>What you can do here</h2><p style="color: var(--muted); line-height: 1.7;">Browse {categoryTools.length} tools in this category, including {liveCount} interactive tools that run directly in the browser.</p><ul>{seo.useCases.map((item) => <li>{item}</li>)}</ul></section>
+    <section class="card" style="padding: 1.25rem;"><h2>Popular tools in {seo.h1}</h2><div style="display: flex; flex-wrap: wrap; gap: .65rem;">{featuredTools.map((tool) => <a class="badge" href={getLocalizedPath({ locale, kind: 'tool', slug: tool.slug })}>{tool.seo[locale].h1}</a>)}</div></section>
+    <section><h2>{copy.tools}</h2><div class="grid-auto" style="margin-top: 1.5rem;">{categoryTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}</div></section>
+  </section>
 </BaseLayout>

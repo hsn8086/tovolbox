@@ -664,10 +664,53 @@ tools.push(
     'zh-CN': { title: 'Base64 大小估算器', description: '估算文件或字节数转换为 Base64 后的大小。' },
     'zh-TW': { title: 'Base64 大小估算器', description: '估算檔案或位元組數轉換為 Base64 後的大小。' },
   }, ['file', 'base64']),
-  ...['communication-style', 'conflict-style', 'learning-style', 'career-interest', 'productivity-style', 'decision-making-style', 'sleep-habit'].map((slug) => tool(`${slug}-reflection`, 'personality-tests', 'quiz', `quiz-${slug}`, {
-    en: { title: `${slug.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join(' ')} Reflection`, description: 'A non-clinical self-reflection quiz for everyday preferences and habits.' },
-    'zh-CN': { title: `${slug} 自我反思`, description: '用于日常偏好和习惯的非临床自我反思测试。' },
-    'zh-TW': { title: `${slug} 自我反思`, description: '用於日常偏好和習慣的非臨床自我反思測驗。' },
+  ...[
+    {
+      slug: 'communication-style',
+      en: { title: 'Communication Style Reflection', description: 'A non-clinical reflection on how you share ideas, listen, and adapt in conversations.' },
+      'zh-CN': { title: '沟通风格自我反思', description: '围绕表达想法、倾听方式和对话适应能力的非临床自我反思。' },
+      'zh-TW': { title: '溝通風格自我反思', description: '圍繞表達想法、傾聽方式和對話適應能力的非臨床自我反思。' },
+    },
+    {
+      slug: 'conflict-style',
+      en: { title: 'Conflict Style Reflection', description: 'Explore how you tend to respond to disagreement, tension, and repair after conflict.' },
+      'zh-CN': { title: '冲突风格自我反思', description: '探索你面对分歧、紧张关系和冲突修复时的常见反应方式。' },
+      'zh-TW': { title: '衝突風格自我反思', description: '探索你面對分歧、緊張關係和衝突修復時的常見反應方式。' },
+    },
+    {
+      slug: 'learning-style',
+      en: { title: 'Learning Style Reflection', description: 'Reflect on how you absorb new information, practice skills, and stay motivated while learning.' },
+      'zh-CN': { title: '学习风格自我反思', description: '反思你吸收新信息、练习技能和保持学习动力的常见方式。' },
+      'zh-TW': { title: '學習風格自我反思', description: '反思你吸收新資訊、練習技能和保持學習動力的常見方式。' },
+    },
+    {
+      slug: 'career-interest',
+      en: { title: 'Career Interest Reflection', description: 'A lightweight reflection on work themes, energy sources, and environments that may fit you.' },
+      'zh-CN': { title: '职业兴趣自我反思', description: '围绕工作主题、能量来源和适合环境的轻量非临床自我反思。' },
+      'zh-TW': { title: '職涯興趣自我反思', description: '圍繞工作主題、能量來源和適合環境的輕量非臨床自我反思。' },
+    },
+    {
+      slug: 'productivity-style',
+      en: { title: 'Productivity Style Reflection', description: 'Review how you plan, focus, recover, and move tasks forward during everyday work.' },
+      'zh-CN': { title: '效率风格自我反思', description: '回顾你在日常工作中计划、专注、恢复和推进任务的方式。' },
+      'zh-TW': { title: '效率風格自我反思', description: '回顧你在日常工作中規劃、專注、恢復和推進任務的方式。' },
+    },
+    {
+      slug: 'decision-making-style',
+      en: { title: 'Decision Making Style Reflection', description: 'Reflect on how you weigh options, use evidence, involve others, and commit to choices.' },
+      'zh-CN': { title: '决策风格自我反思', description: '反思你权衡选项、使用证据、邀请他人参与和做出选择的方式。' },
+      'zh-TW': { title: '決策風格自我反思', description: '反思你權衡選項、使用證據、邀請他人參與和做出選擇的方式。' },
+    },
+    {
+      slug: 'sleep-habit',
+      en: { title: 'Sleep Habit Reflection', description: 'A gentle reflection on bedtime routines, recovery cues, and habits that shape rest.' },
+      'zh-CN': { title: '睡眠习惯自我反思', description: '围绕睡前流程、恢复信号和影响休息习惯的温和自我反思。' },
+      'zh-TW': { title: '睡眠習慣自我反思', description: '圍繞睡前流程、恢復訊號和影響休息習慣的溫和自我反思。' },
+    },
+  ].map((item) => tool(`${item.slug}-reflection`, 'personality-tests', 'quiz', `quiz-${item.slug}`, {
+    en: item.en,
+    'zh-CN': item['zh-CN'],
+    'zh-TW': item['zh-TW'],
   }, ['quiz', 'reflection'])),
 );
 
