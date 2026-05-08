@@ -1,0 +1,11 @@
+---
+import SearchPage from '@/islands/search/SearchPage.tsx';
+import { localeCopy, locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } })); }
+const locale = Astro.params.locale as Locale;
+const copy = localeCopy[locale];
+---
+<BaseLayout locale={locale} title={`${copy.search} | TovolBox`} description={copy.tagline} route={{ locale, kind: 'search' }}>
+  <section class="container" style="padding: 3rem 0;"><h1>{copy.search}</h1><SearchPage client:load locale={locale} /></section>
+</BaseLayout>

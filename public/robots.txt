@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tovolbox.hsn8086.com/sitemap.xml

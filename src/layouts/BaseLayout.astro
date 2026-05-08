@@ -1,0 +1,45 @@
+---
+import SeoHead from '@/components/SeoHead.astro';
+import { localeCopy, rtlLocales, type Locale } from '@/data/locales';
+import type { RouteInput } from '@/lib/i18n/routing';
+import { getLocalizedPath } from '@/lib/i18n/routing';
+import '@/styles/global.css';
+
+type Props = {
+  locale: Locale;
+  title: string;
+  description: string;
+  route: RouteInput;
+  jsonLd?: unknown[];
+};
+
+const { locale, title, description, route, jsonLd } = Astro.props;
+const copy = localeCopy[locale];
+const dir = rtlLocales.has(locale) ? 'rtl' : 'ltr';
+---
+
+<!doctype html>
+<html lang={locale} dir={dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <SeoHead title={title} description={description} route={route} jsonLd={jsonLd} />
+  </head>
+  <body>
+    <header class="container" style="padding: 1.25rem 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+      <a href={getLocalizedPath({ locale, kind: 'home' })} style="font-weight: 900; font-size: 1.15rem;">{copy.siteName}</a>
+      <nav style="display: flex; gap: .75rem; flex-wrap: wrap; color: var(--muted); font-weight: 700;">
+        <a href={getLocalizedPath({ locale, kind: 'categories' })}>{copy.categories}</a>
+        <a href={getLocalizedPath({ locale, kind: 'search' })}>{copy.search}</a>
+        <a href={getLocalizedPath({ locale, kind: 'privacy' })}>{copy.privacy}</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="container" style="padding: 3rem 0 2rem; color: var(--muted); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+      <span>© {new Date().getFullYear()} TovolBox</span>
+      <span>{copy.localOnly}</span>
+    </footer>
+  </body>
+</html>

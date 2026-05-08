@@ -1,0 +1,16 @@
+---
+import ToolRegistry from '@/islands/tools/ToolRegistry.tsx';
+
+type Props = {
+  component?: string;
+  title: string;
+};
+
+const { component, title } = Astro.props;
+---
+
+{component ? <ToolRegistry client:load component={component} title={title} /> : (
+  <section class="card" style="padding: 1.25rem;">
+    <p>This page is an educational guide. It does not provide an official test, diagnosis, or clinical interpretation.</p>
+  </section>
+)}

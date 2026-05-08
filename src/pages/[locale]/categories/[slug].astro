@@ -1,0 +1,14 @@
+---
+import ToolCard from '@/components/ToolCard.astro';
+import { categories, getToolsByCategory } from '@/data/content';
+import { locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').flatMap((locale) => categories.map((category) => ({ params: { locale, slug: category.slug } }))); }
+const locale = Astro.params.locale as Locale;
+const category = categories.find((item) => item.slug === Astro.params.slug)!;
+const seo = category.seo[locale];
+const categoryTools = getToolsByCategory(category.slug);
+---
+<BaseLayout locale={locale} title={seo.title} description={seo.description} route={{ locale, kind: 'category', slug: category.slug }}>
+  <section class="container" style="padding: 3rem 0;"><span class="badge">Category</span><h1>{seo.h1}</h1><p style="color: var(--muted); max-width: 760px; line-height: 1.7;">{seo.intro}</p><div class="grid-auto" style="margin-top: 1.5rem;">{categoryTools.map((tool) => <ToolCard tool={tool} locale={locale} />)}</div></section>
+</BaseLayout>

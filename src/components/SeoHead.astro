@@ -1,0 +1,28 @@
+---
+import { getCanonicalUrl, getHreflangLinks, type RouteInput } from '@/lib/i18n/routing';
+
+type Props = {
+  title: string;
+  description: string;
+  route: RouteInput;
+  jsonLd?: unknown[];
+};
+
+const { title, description, route, jsonLd = [] } = Astro.props;
+const canonical = getCanonicalUrl(route, Astro.site?.toString());
+const alternates = getHreflangLinks({ kind: route.kind, slug: route.slug }, Astro.site?.toString());
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{alternates.map((item) => <link rel="alternate" hreflang={item.hreflang} href={item.href} />)}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TovolBox" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{jsonLd.map((item) => <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />)}

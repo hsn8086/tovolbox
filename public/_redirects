@@ -1,0 +1,9 @@
+/en/ /
+/en/search/ /search/
+/en/categories/ /categories/
+/en/categories/:slug /categories/:slug
+/en/tools/:slug /tools/:slug
+/en/about/ /about/
+/en/privacy/ /privacy/
+/en/terms/ /terms/
+/en/contact/ /contact/

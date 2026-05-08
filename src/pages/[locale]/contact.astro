@@ -1,0 +1,7 @@
+---
+import { locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } })); }
+const locale = Astro.params.locale as Locale;
+---
+<BaseLayout locale={locale} title="Contact | TovolBox" description="Contact TovolBox." route={{ locale, kind: 'contact' }}><section class="container" style="padding: 3rem 0; max-width: 820px;"><h1>Contact</h1><p>Contact details will be added before launch.</p></section></BaseLayout>

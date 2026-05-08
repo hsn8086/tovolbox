@@ -1,0 +1,7 @@
+---
+import { locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } })); }
+const locale = Astro.params.locale as Locale;
+---
+<BaseLayout locale={locale} title="Terms | TovolBox" description="Terms for using TovolBox." route={{ locale, kind: 'terms' }}><section class="container" style="padding: 3rem 0; max-width: 820px;"><h1>Terms</h1><p>Tools are provided for informational and productivity purposes.</p></section></BaseLayout>

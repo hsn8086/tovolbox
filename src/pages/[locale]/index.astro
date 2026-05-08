@@ -1,0 +1,39 @@
+---
+import ToolCard from '@/components/ToolCard.astro';
+import { categories, tools } from '@/data/content';
+import { localeCopy, locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getLocalizedPath } from '@/lib/i18n/routing';
+import { websiteJsonLd } from '@/lib/seo/jsonld';
+
+export function getStaticPaths() {
+  return locales.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } }));
+}
+
+const locale = Astro.params.locale as Locale;
+const copy = localeCopy[locale];
+const featured = tools.filter((tool) => tool.status === 'live').slice(0, 8);
+---
+
+<BaseLayout locale={locale} title={`TovolBox | ${copy.tools}`} description={copy.tagline} route={{ locale, kind: 'home' }} jsonLd={[websiteJsonLd(Astro.site?.toString())]}>
+  <section class="container" style="padding: 4rem 0 2rem;">
+    <div style="max-width: 760px;">
+      <span class="badge">TovolBox</span>
+      <h1 style="font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1; margin: 1rem 0;">{copy.tagline}</h1>
+      <div style="display: flex; gap: .75rem; flex-wrap: wrap; margin-top: 1.5rem;">
+        <a class="btn" href={getLocalizedPath({ locale, kind: 'search' })}>{copy.search}</a>
+        <a class="btn btn-secondary" href={getLocalizedPath({ locale, kind: 'categories' })}>{copy.allCategories}</a>
+      </div>
+    </div>
+  </section>
+  <section class="container" style="padding: 2rem 0;">
+    <h2>{copy.popularTools}</h2>
+    <div class="grid-auto">{featured.map((tool) => <ToolCard tool={tool} locale={locale} />)}</div>
+  </section>
+  <section class="container" style="padding: 2rem 0;">
+    <h2>{copy.allCategories}</h2>
+    <div class="grid-auto">
+      {categories.map((category) => <a class="card" style="padding: 1.1rem;" href={getLocalizedPath({ locale, kind: 'category', slug: category.slug })}><h3>{category.seo[locale].h1}</h3><p style="color: var(--muted);">{category.seo[locale].description}</p></a>)}
+    </div>
+  </section>
+</BaseLayout>

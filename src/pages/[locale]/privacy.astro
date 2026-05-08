@@ -1,0 +1,7 @@
+---
+import { locales, type Locale } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+export function getStaticPaths() { return locales.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } })); }
+const locale = Astro.params.locale as Locale;
+---
+<BaseLayout locale={locale} title="Privacy Policy | TovolBox" description="TovolBox privacy policy for local browser tools." route={{ locale, kind: 'privacy' }}><section class="container" style="padding: 3rem 0; max-width: 820px;"><h1>Privacy Policy</h1><p>Most tools process data locally in your browser. Psychological answers are not collected.</p></section></BaseLayout>

@@ -1,0 +1,10 @@
+---
+import SearchPage from '@/islands/search/SearchPage.tsx';
+import { localeCopy } from '@/data/locales';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+const locale = 'en';
+const copy = localeCopy[locale];
+---
+<BaseLayout locale={locale} title="Search Tools | TovolBox" description="Search TovolBox tools by name, category, tag, or keyword." route={{ locale, kind: 'search' }}>
+  <section class="container" style="padding: 3rem 0;"><h1>{copy.search}</h1><SearchPage client:load locale={locale} /></section>
+</BaseLayout>

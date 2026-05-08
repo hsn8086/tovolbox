@@ -1,0 +1,5 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+const locale = 'en';
+---
+<BaseLayout locale={locale} title="Page Not Found | TovolBox" description="The requested page could not be found." route={{ locale, kind: 'home' }}><section class="container" style="padding: 5rem 0;"><h1>Page not found</h1><a class="btn" href="/">Back home</a></section></BaseLayout>
