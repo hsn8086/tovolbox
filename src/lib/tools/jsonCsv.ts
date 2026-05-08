@@ -11,6 +11,8 @@ export type JsonCsvResult =
 
 type CsvRecord = Record<string, string>;
 
+export type Delimiter = ',' | ';' | '\t' | '|';
+
 function failure(error: string): JsonCsvResult {
   return { ok: false, output: '', error };
 }
@@ -25,12 +27,16 @@ function stringifyCell(value: unknown): string {
   return String(value);
 }
 
-function escapeCsvCell(value: string): string {
-  if (!/[",\r\n]/.test(value)) return value;
+function escapeRegExp(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeCsvCell(value: string, delimiter: Delimiter = ','): string {
+  if (!new RegExp(`["\r\n${escapeRegExp(delimiter)}]`).test(value)) return value;
   return `"${value.replace(/"/g, '""')}"`;
 }
 
-function parseCsv(input: string): string[][] {
+function parseDelimited(input: string, delimiter: Delimiter = ','): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
@@ -60,7 +66,7 @@ function parseCsv(input: string): string[][] {
       continue;
     }
 
-    if (char === ',') {
+    if (char === delimiter) {
       row.push(cell);
       cell = '';
       cellStarted = false;
@@ -98,7 +104,7 @@ export function jsonToCsv(input: string): JsonCsvResult {
     const headers = Array.from(new Set(parsed.flatMap((item) => Object.keys(item))));
     const rows = parsed.map((item) => headers.map((header) => escapeCsvCell(stringifyCell(item[header]))).join(','));
 
-    return { ok: true, output: [headers.map(escapeCsvCell).join(','), ...rows].join('\n') };
+    return { ok: true, output: [headers.map((header) => escapeCsvCell(header)).join(','), ...rows].join('\n') };
   } catch (error) {
     return failure(error instanceof Error ? error.message : 'Invalid JSON');
   }
@@ -106,7 +112,7 @@ export function jsonToCsv(input: string): JsonCsvResult {
 
 export function csvToJson(input: string): JsonCsvResult {
   try {
-    const rows = parseCsv(input);
+    const rows = parseDelimited(input);
     if (rows.length === 0) return failure('CSV input must include a header row');
 
     const [headers, ...dataRows] = rows;
@@ -127,6 +133,20 @@ export function csvToJson(input: string): JsonCsvResult {
       });
 
     return { ok: true, output: JSON.stringify(records, null, 2) };
+  } catch (error) {
+    return failure(error instanceof Error ? error.message : 'Invalid CSV');
+  }
+}
+
+export function convertCsvDelimiter(input: string, fromDelimiter: Delimiter, toDelimiter: Delimiter): JsonCsvResult {
+  try {
+    const rows = parseDelimited(input, fromDelimiter);
+    if (rows.length === 0) return failure('CSV input cannot be empty');
+
+    return {
+      ok: true,
+      output: rows.map((row) => row.map((cell) => escapeCsvCell(cell, toDelimiter)).join(toDelimiter)).join('\n'),
+    };
   } catch (error) {
     return failure(error instanceof Error ? error.message : 'Invalid CSV');
   }

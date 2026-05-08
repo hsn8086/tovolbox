@@ -219,3 +219,35 @@ test('developer tools expose dedicated regex cron and base fields', async ({ pag
   await page.getByLabel('To base').fill('10');
   await expect(page.getByLabel('Output')).toContainText('10');
 });
+
+test('new stage 12 data and text tools expose useful outputs', async ({ page }) => {
+  await page.goto('/tools/url-parser/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'Input' }).fill('https://example.com/a/b?tag=json&tag=seo#top');
+  await expect(page.getByLabel('Output')).toContainText('"hostname": "example.com"');
+  await expect(page.getByLabel('Output')).toContainText('"values": [');
+
+  await page.goto('/tools/csv-delimiter-converter/');
+  await waitForToolReady(page);
+  await page.getByLabel('To delimiter').selectOption('|');
+  await page.getByRole('textbox', { name: 'Input' }).fill('name,role\nAda,Engineer');
+  await expect(page.getByLabel('Output')).toContainText('name|role');
+
+  await page.goto('/tools/xml-formatter/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'Input' }).fill('<root><item>Hello</item></root>');
+  await expect(page.getByLabel('Output')).toContainText('  <item>');
+
+  await page.goto('/tools/diff-checker/');
+  await waitForToolReady(page);
+  await page.getByLabel('Original text').fill('alpha\nbeta');
+  await page.getByLabel('Changed text').fill('alpha\ngamma');
+  await expect(page.getByLabel('Output')).toContainText('- beta');
+  await expect(page.getByLabel('Output')).toContainText('+ gamma');
+
+  await page.goto('/tools/lorem-ipsum-generator/');
+  await waitForToolReady(page);
+  await page.getByLabel('Paragraphs').fill('2');
+  await page.getByLabel('Sentences per paragraph').fill('1');
+  await expect(page.getByLabel('Output')).toContainText('Lorem ipsum dolor sit amet');
+});

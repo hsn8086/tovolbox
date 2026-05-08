@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   deduplicateLines,
+  diffLines,
   extractEmails,
   extractNumbers,
   extractUrls,
   findAndReplace,
+  formatLineDiff,
+  generateLoremIpsum,
   removeEmptyLines,
   sortLines,
   trimLines,
@@ -63,5 +66,23 @@ describe('text extract pure functions', () => {
 
   it('returns the original text when the find value is empty', () => {
     expect(findAndReplace('unchanged', '', 'x')).toBe('unchanged');
+  });
+
+  it('diffs lines with additions and removals', () => {
+    expect(diffLines('a\nb\nc', 'a\nc\nd')).toEqual([
+      { type: 'same', text: 'a' },
+      { type: 'removed', text: 'b' },
+      { type: 'same', text: 'c' },
+      { type: 'added', text: 'd' },
+    ]);
+    expect(formatLineDiff('a\nb', 'a\nc')).toBe('  a\n- b\n+ c');
+  });
+
+  it('generates bounded lorem ipsum paragraphs', () => {
+    const output = generateLoremIpsum(2, 2);
+
+    expect(output.split('\n\n')).toHaveLength(2);
+    expect(output).toContain('Lorem ipsum dolor sit amet');
+    expect(generateLoremIpsum(99, 99).split('\n\n')).toHaveLength(20);
   });
 });

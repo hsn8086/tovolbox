@@ -10,7 +10,9 @@ import { getUnitMode } from '@/islands/tools/UnitConverterTool';
 
 describe('specialized tool mode routing', () => {
   it('maps data tools', () => expect(getDataMode('json-formatter')).toBe('json-formatter'));
+  it('maps new data tools', () => expect(getDataMode('url-parser')).toBe('url-parser'));
   it('maps text tools', () => expect(getTextMode('extract-emails')).toBe('extract-emails'));
+  it('maps new text tools', () => expect(getTextMode('diff-checker')).toBe('diff-checker'));
   it('maps unit tools', () => expect(getUnitMode('temperature-converter')).toBe('temperature'));
   it('maps color tools', () => expect(getColorMode('contrast-ratio')).toBe('contrast-ratio'));
   it('maps encode and crypto tools', () => expect(getEncodeCryptoMode('hash-sha256')).toBe('hash-sha256'));

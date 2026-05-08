@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { csvToJson, jsonToCsv } from '@/lib/tools/jsonCsv';
+import { convertCsvDelimiter, csvToJson, jsonToCsv } from '@/lib/tools/jsonCsv';
 
 describe('JSON and CSV conversion', () => {
   it('converts an array of objects to CSV', () => {
@@ -89,6 +89,24 @@ describe('JSON and CSV conversion', () => {
       ok: false,
       output: '',
       error: 'CSV row 2 has 1 fields; expected 2',
+    });
+  });
+
+  it('converts CSV delimiters while preserving quoted fields', () => {
+    const result = convertCsvDelimiter('name,notes\nAda,"Hello, world"', ',', ';');
+
+    expect(result).toEqual({
+      ok: true,
+      output: 'name;notes\nAda;Hello, world',
+    });
+  });
+
+  it('quotes fields when the target delimiter appears in a cell', () => {
+    const result = convertCsvDelimiter('name;notes\nAda;Hello|world', ';', '|');
+
+    expect(result).toEqual({
+      ok: true,
+      output: 'name|notes\nAda|"Hello|world"',
     });
   });
 });

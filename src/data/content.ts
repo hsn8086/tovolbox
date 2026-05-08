@@ -270,6 +270,31 @@ export const tools: Tool[] = [
     ja: { title: 'クエリ文字列ビルダー', description: 'キーと値のペアから、URL向けにエンコードされたクエリ文字列を作成します。' },
     ko: { title: '쿼리 문자열 빌더', description: '키-값 쌍으로 인코딩된 URL 쿼리 문자열을 만듭니다.' },
   }, ['query string', 'url']),
+  tool('url-parser', 'json-data-tools', 'text-analyze', 'url-parser', {
+    en: { title: 'URL Parser', description: 'Break a URL into protocol, host, path, query parameters, and hash parts.' },
+    'zh-CN': { title: 'URL 解析器', description: '将 URL 拆解为协议、主机、路径、查询参数和 hash 部分。' },
+    'zh-TW': { title: 'URL 解析器', description: '將 URL 拆解為協定、主機、路徑、查詢參數和 hash 部分。' },
+  }, ['url', 'parser', 'query string']),
+  tool('csv-delimiter-converter', 'json-data-tools', 'text-transform', 'csv-delimiter-converter', {
+    en: { title: 'CSV Delimiter Converter', description: 'Convert CSV between comma, semicolon, tab, and pipe delimiters while preserving quoted fields.' },
+    'zh-CN': { title: 'CSV 分隔符转换器', description: '在逗号、分号、制表符和竖线分隔符之间转换 CSV，并保留引用字段。' },
+    'zh-TW': { title: 'CSV 分隔符轉換器', description: '在逗號、分號、定位字元和直線分隔符之間轉換 CSV，並保留引用欄位。' },
+  }, ['csv', 'delimiter', 'converter']),
+  tool('xml-formatter', 'json-data-tools', 'text-transform', 'xml-formatter', {
+    en: { title: 'XML Formatter', description: 'Format XML-style markup into readable indented lines in the browser.' },
+    'zh-CN': { title: 'XML 格式化工具', description: '在浏览器中将 XML 标记格式化为可读缩进行。' },
+    'zh-TW': { title: 'XML 格式化工具', description: '在瀏覽器中將 XML 標記格式化為可讀縮排行。' },
+  }, ['xml', 'formatter']),
+  tool('html-formatter', 'json-data-tools', 'text-transform', 'html-formatter', {
+    en: { title: 'HTML Formatter', description: 'Format HTML snippets into readable indented markup without uploading content.' },
+    'zh-CN': { title: 'HTML 格式化工具', description: '将 HTML 片段格式化为可读缩进标记，内容不会上传。' },
+    'zh-TW': { title: 'HTML 格式化工具', description: '將 HTML 片段格式化為可讀縮排標記，內容不會上傳。' },
+  }, ['html', 'formatter']),
+  tool('css-formatter', 'json-data-tools', 'text-transform', 'css-formatter', {
+    en: { title: 'CSS Formatter', description: 'Format CSS rules and declarations into readable indented blocks.' },
+    'zh-CN': { title: 'CSS 格式化工具', description: '将 CSS 规则和声明格式化为可读缩进代码块。' },
+    'zh-TW': { title: 'CSS 格式化工具', description: '將 CSS 規則和宣告格式化為可讀縮排程式碼區塊。' },
+  }, ['css', 'formatter']),
   tool('base64-encode-decode', 'encoding-decoding-tools', 'encode-decode', 'base64', {
     en: { title: 'Base64 Encode and Decode', description: 'Encode plain text to Base64 or decode Base64 back to readable text.' },
     'zh-CN': { title: 'Base64 编码解码', description: '将文本编码为 Base64，或将 Base64 解码为可读文本。' },
@@ -417,6 +442,16 @@ export const tools: Tool[] = [
     ja: { title: 'Markdown目次生成ツール', description: '見出しを抽出し、整ったMarkdownの目次を生成します。' },
     ko: { title: 'Markdown 목차 생성기', description: '제목을 추출해 깔끔한 Markdown 목차를 생성합니다.' },
   }, ['markdown', 'toc']),
+  tool('diff-checker', 'text-tools', 'text-analyze', 'diff-checker', {
+    en: { title: 'Diff Checker', description: 'Compare two text blocks line by line and mark additions and removals.' },
+    'zh-CN': { title: '文本差异对比工具', description: '逐行比较两段文本，并标记新增和删除内容。' },
+    'zh-TW': { title: '文字差異比對工具', description: '逐行比較兩段文字，並標記新增和刪除內容。' },
+  }, ['diff', 'text', 'compare']),
+  tool('lorem-ipsum-generator', 'text-tools', 'generator', 'lorem-ipsum-generator', {
+    en: { title: 'Lorem Ipsum Generator', description: 'Generate placeholder paragraphs for layouts, mockups, and content drafts.' },
+    'zh-CN': { title: 'Lorem Ipsum 生成器', description: '为布局、原型和内容草稿生成占位段落。' },
+    'zh-TW': { title: 'Lorem Ipsum 產生器', description: '為版面、原型和內容草稿產生佔位段落。' },
+  }, ['lorem ipsum', 'placeholder', 'generator']),
   tool('password-generator', 'developer-tools', 'generator', 'password-generator', {
     en: { title: 'Password Generator', description: 'Generate strong random passwords locally with selected character sets.' },
     'zh-CN': { title: '密码生成器', description: '在本地生成包含所选字符集的强随机密码。' },
