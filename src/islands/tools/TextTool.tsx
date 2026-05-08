@@ -11,7 +11,7 @@ export function getTextMode(component: string): TextMode {
   return modes.includes(component as (typeof modes)[number]) ? component as TextMode : 'generic';
 }
 
-export default function TextTool({ component, title }: { component: string; title: string }) {
+export default function TextTool({ component, title, privacyNote }: { component: string; title: string; privacyNote: string }) {
   const mode = getTextMode(component);
   const [input, setInput] = useState('Hello world\nhello@example.com\nhttps://tovolbox.hsn8086.com/tools/\n42');
   const [find, setFind] = useState('Hello');
@@ -31,5 +31,5 @@ export default function TextTool({ component, title }: { component: string; titl
     if (mode === 'markdown-toc') return [generateMarkdownToc(input), markdownToPlainText(input), JSON.stringify(extractHeadings(input), null, 2)].join('\n\n');
     return input;
   }, [find, input, mode, replaceWith]);
-  return <ToolPanel title={title}>{mode === 'find-replace' && <div className="grid-auto" style={{ marginBottom: '.75rem' }}><label>Find<input className="input" value={find} onChange={(event) => setFind(event.target.value)} /></label><label>Replace<input className="input" value={replaceWith} onChange={(event) => setReplaceWith(event.target.value)} /></label></div>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}>{mode === 'find-replace' && <div className="grid-auto" style={{ marginBottom: '.75rem' }}><label>Find<input className="input" value={find} onChange={(event) => setFind(event.target.value)} /></label><label>Replace<input className="input" value={replaceWith} onChange={(event) => setReplaceWith(event.target.value)} /></label></div>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }

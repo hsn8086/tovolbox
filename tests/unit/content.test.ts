@@ -90,6 +90,8 @@ describe('content data', () => {
     for (const locale of ['en', 'zh-CN', 'zh-TW', 'ja', 'ko'] as const) {
       expect(getPageCopy(locale).privacyTitle).toBeTruthy();
       expect(getPageCopy(locale).ymylDisclaimer).toMatch(/diagnosis|诊断|診斷|診断|진단/i);
+      expect(getPageCopy(locale).toolPrivacyNote).toBeTruthy();
+      expect(getPageCopy(locale).privacyAnalyticsBody).toBeTruthy();
       expect(getSearchCopy(locale).label).toBeTruthy();
       expect(getSearchCopy(locale).resultSummary(2, 'json', 'seo', true)).toContain('2');
     }
@@ -98,6 +100,15 @@ describe('content data', () => {
     expect(getPageCopy('ko').privacyTitle).not.toBe(getPageCopy('en').privacyTitle);
     expect(getSearchCopy('ja').placeholder).not.toBe(getSearchCopy('en').placeholder);
     expect(getSearchCopy('ko').placeholder).not.toBe(getSearchCopy('en').placeholder);
+  });
+
+  it('states local-input and analytics privacy boundaries clearly', () => {
+    const copy = getPageCopy('en');
+
+    expect(copy.privacyToolInputBody).toMatch(/text, JSON, images, generated hashes, or reflection answers/i);
+    expect(copy.privacyAnalyticsBody).toMatch(/must not collect textbox contents, files, images, JSON payloads, hash inputs, or reflection quiz answers/i);
+    expect(copy.toolPrivacyNote).toMatch(/Files, text, JSON, hashes, and reflection answers are not uploaded/i);
+    expect(copy.privacySecurityBody).toMatch(/Dependency audit findings are reviewed individually/i);
   });
 
   it('localizes fallback SEO section headings for priority languages', () => {

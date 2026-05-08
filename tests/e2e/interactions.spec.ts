@@ -51,12 +51,16 @@ test('priority localized search and privacy pages avoid English fallback', async
   await page.goto('/ko/privacy/');
   await expect(page.getByRole('heading', { name: '개인정보 처리방침' })).toBeVisible();
   await expect(page.getByRole('heading', { name: '로컬 처리' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '도구 입력' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '분석 데이터 원칙' })).toBeVisible();
   await expect(page.getByText(/심리 관련 답변을 수집하지 않습니다/)).toBeVisible();
 });
 
 test('reflection quiz records answers and shows result', async ({ page }) => {
   await page.goto('/tools/big-five-lite-reflection/');
-  await expect(page.locator('aside').filter({ hasText: /personal insight/i })).toBeVisible();
+  await expect(page.getByText(/Files, text, JSON, hashes, and reflection answers are not uploaded/i)).toBeVisible();
+  const quizTool = page.locator('astro-island').filter({ has: page.getByRole('heading', { name: 'Big Five Lite Reflection' }) });
+  await expect(quizTool.locator('aside').filter({ hasText: /not a medical diagnosis/i })).toBeVisible();
   await page.locator('input[type="radio"][value="4"]').first().check();
   await expect(page.getByText(/1 \/ 10 answered/)).toBeVisible();
   await expect(page.getByText(/Reflection result/)).toBeVisible();
@@ -76,7 +80,7 @@ test('image canvas tool loads local processing UI', async ({ page }) => {
   await page.goto('/tools/image-grayscale-converter/');
   const tool = page.locator('section.card').filter({ has: page.getByRole('heading', { name: /Local image grayscale/i }) });
   await expect(tool).toBeVisible();
-  await expect(tool.getByText(/processed locally/i)).toBeVisible();
+  await expect(tool.getByText(/Files, text, JSON, hashes, and reflection answers are not uploaded/i)).toBeVisible();
   await expect(tool.getByLabel(/Upload image/i)).toBeVisible();
   await expect(tool.getByRole('button', { name: /Download PNG/i })).toBeDisabled();
 });

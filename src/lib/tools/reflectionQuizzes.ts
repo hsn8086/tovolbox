@@ -59,7 +59,7 @@ export const REFLECTION_QUIZ_OPTIONS: ReflectionQuizOption[] = [
 ];
 
 export const REFLECTION_QUIZ_DISCLAIMER =
-  'This reflection quiz is for personal insight and conversation only. It does not label people or evaluate health, and it should not replace support from a qualified professional.';
+  'This tool is for personal insight, self-reflection, and educational purposes only. It is not a medical diagnosis, clinical psychological assessment, or substitute for care from a qualified mental health professional.';
 
 export const reflectionQuizzes: ReflectionQuiz[] = [
   {

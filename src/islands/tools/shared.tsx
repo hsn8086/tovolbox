@@ -18,6 +18,10 @@ export function OutputBox({ value }: { value: string }) {
   );
 }
 
-export function ToolPanel({ title, children }: { title: string; children: ReactNode }) {
-  return <section className="card" style={{ padding: '1.25rem' }}><h2 style={{ marginTop: 0 }}>{title}</h2>{children}</section>;
+export function PrivacyNote({ children }: { children: ReactNode }) {
+  return <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{children}</p>;
+}
+
+export function ToolPanel({ title, privacyNote, children }: { title: string; privacyNote?: string; children: ReactNode }) {
+  return <section className="card" style={{ padding: '1.25rem' }}><h2 style={{ marginTop: 0 }}>{title}</h2>{privacyNote && <PrivacyNote>{privacyNote}</PrivacyNote>}{children}</section>;
 }

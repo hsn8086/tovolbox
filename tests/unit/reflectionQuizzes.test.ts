@@ -40,7 +40,9 @@ describe('reflection quizzes', () => {
       expect(result.dimensions.length).toBe(new Set(quiz.questions.map((question) => question.dimension)).size);
       expect(result.disclaimer).toBe(REFLECTION_QUIZ_DISCLAIMER);
       expect(result.disclaimer).toContain('personal insight');
-      expect(JSON.stringify(result)).not.toMatch(blockedTerms);
+      expect(result.disclaimer).toContain('self-reflection');
+      expect(result.disclaimer).toContain('not a medical diagnosis');
+      expect(`${result.summary} ${result.dimensions.map((dimension) => dimension.summary).join(' ')}`).not.toMatch(blockedTerms);
     }
   });
 

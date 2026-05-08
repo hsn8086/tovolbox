@@ -11,7 +11,7 @@ export function getDataMode(component: string): DataMode {
   return 'generic';
 }
 
-export default function DataTool({ component, title }: { component: string; title: string }) {
+export default function DataTool({ component, title, privacyNote }: { component: string; title: string; privacyNote: string }) {
   const mode = getDataMode(component);
   const [input, setInput] = useState(sample(mode));
   const output = useMemo(() => {
@@ -34,7 +34,7 @@ export default function DataTool({ component, title }: { component: string; titl
     }
   }, [input, mode]);
 
-  return <ToolPanel title={title}><label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}><label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }
 
 function sample(mode: DataMode): string {

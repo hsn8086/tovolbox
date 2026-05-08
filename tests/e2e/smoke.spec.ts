@@ -9,6 +9,7 @@ test('home, locale, category, and tool pages render', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await page.goto('/tools/json-formatter/');
   await expect(page.locator('h1')).toHaveText(/JSON Formatter/);
+  await expect(page.getByText(/Tool input stays in this browser and is processed locally/i)).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/tools\/json-formatter\/$/);
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('JSON and Data Tools');
   await expect(page.getByRole('heading', { name: 'When to use this formatter' })).toBeVisible();

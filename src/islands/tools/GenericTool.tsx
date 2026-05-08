@@ -32,7 +32,7 @@ type Props = {
   title: string;
 };
 
-export default function GenericTool({ component, title }: Props) {
+export default function GenericTool({ component, title, privacyNote }: Props & { privacyNote: string }) {
   const [input, setInput] = useState('');
   const [mode, setMode] = useState('encode');
   const [fileInfo, setFileInfo] = useState<string>('');
@@ -162,6 +162,7 @@ export default function GenericTool({ component, title }: Props) {
   return (
     <section className="card" style={{ padding: '1.25rem' }}>
       <h2 style={{ marginTop: 0 }}>{title}</h2>
+      <p style={{ color: 'var(--muted)', lineHeight: 1.6 }}>{privacyNote}</p>
       {(component === 'base64' || component === 'url-codec' || component === 'html-entity') && (
         <label style={{ display: 'block', marginBottom: '.75rem' }}>
           Mode

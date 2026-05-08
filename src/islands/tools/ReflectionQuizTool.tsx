@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react';
-import { REFLECTION_QUIZ_DISCLAIMER, REFLECTION_QUIZ_OPTIONS, reflectionQuizzes, scoreReflectionQuiz, type ReflectionQuizId } from '@/lib/tools/reflectionQuizzes';
+import { REFLECTION_QUIZ_OPTIONS, reflectionQuizzes, scoreReflectionQuiz, type ReflectionQuizId } from '@/lib/tools/reflectionQuizzes';
+import { PrivacyNote } from './shared';
 
 type Props = {
   component: string;
+  disclaimer: string;
+  privacyNote: string;
 };
 
 export function selectQuizByComponent(component: string): ReflectionQuizId {
@@ -10,7 +13,7 @@ export function selectQuizByComponent(component: string): ReflectionQuizId {
   return reflectionQuizzes.some((quiz) => quiz.id === id) ? id : 'big-five-lite';
 }
 
-export default function ReflectionQuizTool({ component }: Props) {
+export default function ReflectionQuizTool({ component, disclaimer, privacyNote }: Props) {
   const quizId = selectQuizByComponent(component);
   const quiz = reflectionQuizzes.find((item) => item.id === quizId)!;
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -21,7 +24,8 @@ export default function ReflectionQuizTool({ component }: Props) {
     <section className="card" style={{ padding: '1.25rem' }}>
       <h2 style={{ marginTop: 0 }}>{quiz.title}</h2>
       <p style={{ color: 'var(--muted)', lineHeight: 1.65 }}>{quiz.description}</p>
-      <aside className="card" style={{ padding: '1rem', borderColor: '#fbbf24', marginBottom: '1rem' }}>{REFLECTION_QUIZ_DISCLAIMER}</aside>
+      <PrivacyNote>{privacyNote}</PrivacyNote>
+      <aside className="card" style={{ padding: '1rem', borderColor: '#fbbf24', marginBottom: '1rem' }}>{disclaimer}</aside>
       <p style={{ color: 'var(--muted)' }}>{completed} / {quiz.questions.length} answered</p>
       <div style={{ display: 'grid', gap: '1rem' }}>
         {quiz.questions.map((question, index) => (
@@ -42,7 +46,7 @@ export default function ReflectionQuizTool({ component }: Props) {
         <h3>Reflection result</h3>
         <p><strong>{result.band}</strong>: {result.summary}</p>
         <ul>{result.dimensions.map((dimension) => <li key={dimension.dimension}>{dimension.summary} ({dimension.score}/{dimension.maxScore})</li>)}</ul>
-        <p style={{ color: 'var(--muted)' }}>{result.disclaimer}</p>
+        <p style={{ color: 'var(--muted)' }}>{disclaimer}</p>
       </section>
     </section>
   );

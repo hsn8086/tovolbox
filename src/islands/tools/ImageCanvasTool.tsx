@@ -1,9 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import type { CSSProperties, Dispatch, SetStateAction } from 'react';
 import { calculateCropRect, calculateResizeDimensions, formatBytes, imageMimeToExtension, type ResizeFit } from '@/lib/tools/image';
+import { PrivacyNote } from './shared';
 
 type Props = {
   component: string;
+  privacyNote: string;
 };
 
 export type ImageCanvasMode = 'inspect' | 'resizer' | 'crop' | 'grayscale' | 'rotate' | 'flip' | 'brightness' | 'contrast' | 'saturation' | 'watermark';
@@ -129,7 +131,7 @@ export function applySaturationChannel(value: number, gray: number, saturation: 
   return clamp(gray + (value - gray) * saturation);
 }
 
-export default function ImageCanvasTool({ component }: Props) {
+export default function ImageCanvasTool({ component, privacyNote }: Props) {
   const mode = normalizeImageMode(component);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -242,7 +244,7 @@ export default function ImageCanvasTool({ component }: Props) {
   return (
     <section className="card" style={{ padding: '1.25rem' }}>
       <h2 style={{ marginTop: 0 }}>Local image {mode}</h2>
-      <p style={{ color: 'var(--muted)' }}>Your image is processed locally and is not uploaded.</p>
+      <PrivacyNote>{privacyNote}</PrivacyNote>
       <label htmlFor={fileInputId} style={{ display: 'block', fontWeight: 800, marginBottom: '.45rem' }}>Upload image</label>
       <input id={fileInputId} className="input" type="file" accept="image/*" onChange={(event) => event.target.files?.[0] && handleFile(event.target.files[0])} />
       <ImageControls mode={mode} settings={settings} setSettings={setSettings} />

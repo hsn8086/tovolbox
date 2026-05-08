@@ -1,16 +1,20 @@
 ---
 import ToolRegistry from '@/islands/tools/ToolRegistry.tsx';
+import type { Locale } from '@/data/locales';
+import { getPageCopy } from '@/data/pageCopy';
 
 type Props = {
   component?: string;
   title: string;
+  locale: Locale;
 };
 
-const { component, title } = Astro.props;
+const { component, title, locale } = Astro.props;
+const pageCopy = getPageCopy(locale);
 ---
 
-{component ? <ToolRegistry client:load component={component} title={title} /> : (
+{component ? <ToolRegistry client:load component={component} title={title} privacyNote={pageCopy.toolPrivacyNote} ymylDisclaimer={pageCopy.ymylDisclaimer} /> : (
   <section class="card" style="padding: 1.25rem;">
-    <p>This page is an educational guide. It does not provide an official test, diagnosis, or clinical interpretation.</p>
+    <p>{pageCopy.ymylDisclaimer}</p>
   </section>
 )}

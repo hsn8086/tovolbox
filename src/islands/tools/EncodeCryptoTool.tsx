@@ -12,7 +12,7 @@ export function getEncodeCryptoMode(component: string): string {
   return 'generic';
 }
 
-export default function EncodeCryptoTool({ component, title }: { component: string; title: string }) {
+export default function EncodeCryptoTool({ component, title, privacyNote }: { component: string; title: string; privacyNote: string }) {
   const mode = getEncodeCryptoMode(component);
   const [input, setInput] = useState(mode.startsWith('hash-') ? '' : 'hello');
   const [operation, setOperation] = useState('encode');
@@ -40,5 +40,5 @@ export default function EncodeCryptoTool({ component, title }: { component: stri
       return input;
     } catch (error) { return error instanceof Error ? error.message : 'Unable to process input.'; }
   }, [asyncOutput, input, mode, operation]);
-  return <ToolPanel title={title}>{['base64', 'url-codec', 'html-entity'].includes(mode) && <label style={{ display: 'block', marginBottom: '.75rem' }}>Mode<select className="select" value={operation} onChange={(event) => setOperation(event.target.value)}><option value="encode">Encode</option><option value="decode">Decode</option></select></label>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
+  return <ToolPanel title={title} privacyNote={privacyNote}>{['base64', 'url-codec', 'html-entity'].includes(mode) && <label style={{ display: 'block', marginBottom: '.75rem' }}>Mode<select className="select" value={operation} onChange={(event) => setOperation(event.target.value)}><option value="encode">Encode</option><option value="decode">Decode</option></select></label>}<label style={{ display: 'block', marginBottom: '.75rem' }}>Input<textarea className="textarea" value={input} onChange={(event) => setInput(event.target.value)} /></label><OutputBox value={output} /><CopyActions output={output} onClear={() => setInput('')} /></ToolPanel>;
 }
