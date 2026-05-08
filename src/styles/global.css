@@ -93,6 +93,42 @@ select {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+.markdown-preview {
+  min-height: 180px;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: white;
+  padding: 1rem;
+  line-height: 1.7;
+}
+
+.markdown-preview > :first-child {
+  margin-top: 0;
+}
+
+.markdown-preview > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-preview pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 0.9rem;
+}
+
+.markdown-preview code {
+  border-radius: 0.35rem;
+  background: #e2e8f0;
+  padding: 0.1rem 0.28rem;
+}
+
+.markdown-preview pre code {
+  background: transparent;
+  padding: 0;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;

@@ -28,8 +28,11 @@ describe('specialized tool modes', () => {
     expect(getToolRegistryKind('image-brightness')).toBe('image-canvas');
     expect(getToolRegistryKind('json-formatter')).toBe('data');
     expect(getToolRegistryKind('url-parser')).toBe('data');
+    expect(getToolRegistryKind('yaml-to-json')).toBe('data');
+    expect(getToolRegistryKind('json-to-yaml')).toBe('data');
     expect(getToolRegistryKind('word-counter')).toBe('text');
     expect(getToolRegistryKind('diff-checker')).toBe('text');
+    expect(getToolRegistryKind('markdown-previewer')).toBe('text');
     expect(getToolRegistryKind('temperature-converter')).toBe('unit');
     expect(getToolRegistryKind('hex-to-rgb')).toBe('color');
     expect(getToolRegistryKind('hash-sha256')).toBe('encode-crypto');

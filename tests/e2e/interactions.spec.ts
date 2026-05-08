@@ -238,6 +238,18 @@ test('new stage 12 data and text tools expose useful outputs', async ({ page }) 
   await page.getByRole('textbox', { name: 'Input' }).fill('<root><item>Hello</item></root>');
   await expect(page.getByLabel('Output')).toContainText('  <item>');
 
+  await page.goto('/tools/yaml-to-json/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'Input' }).fill('name: Ada\nskills:\n  - JSON\n  - YAML');
+  await expect(page.getByLabel('Output')).toContainText('"name": "Ada"');
+  await expect(page.getByLabel('Output')).toContainText('"YAML"');
+
+  await page.goto('/tools/json-to-yaml/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'Input' }).fill('{"name":"Ada","skills":["JSON","YAML"]}');
+  await expect(page.getByLabel('Output')).toContainText('name: Ada');
+  await expect(page.getByLabel('Output')).toContainText('- YAML');
+
   await page.goto('/tools/diff-checker/');
   await waitForToolReady(page);
   await page.getByLabel('Original text').fill('alpha\nbeta');
@@ -250,4 +262,10 @@ test('new stage 12 data and text tools expose useful outputs', async ({ page }) 
   await page.getByLabel('Paragraphs').fill('2');
   await page.getByLabel('Sentences per paragraph').fill('1');
   await expect(page.getByLabel('Output')).toContainText('Lorem ipsum dolor sit amet');
+
+  await page.goto('/tools/markdown-previewer/');
+  await waitForToolReady(page);
+  await page.getByRole('textbox', { name: 'Input' }).fill('# Preview\n\nUse **bold** and `code`.');
+  await expect(page.getByRole('region', { name: 'Markdown preview' })).toContainText('Preview');
+  await expect(page.getByRole('region', { name: 'Markdown preview' }).locator('strong')).toContainText('bold');
 });

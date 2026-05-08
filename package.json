@@ -25,7 +25,8 @@
     "react-dom": "latest",
     "tailwind-merge": "latest",
     "tailwindcss": "latest",
-    "vite": "7.3.2"
+    "vite": "7.3.2",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@astrojs/check": "latest",

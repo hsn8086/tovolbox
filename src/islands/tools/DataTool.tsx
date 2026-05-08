@@ -4,11 +4,12 @@ import { formatJson, minifyJson } from '@/lib/tools/json';
 import { convertCsvDelimiter, csvToJson, jsonToCsv, type Delimiter } from '@/lib/tools/jsonCsv';
 import { buildQueryString, parseQueryString } from '@/lib/tools/queryString';
 import { parseUrl } from '@/lib/tools/urlParser';
+import { jsonToYaml, yamlToJson } from '@/lib/tools/yaml';
 import { CopyActions, Field, FieldGrid, OutputBox, ToolPanel } from './shared';
 
-export type DataMode = 'json-formatter' | 'json-minifier' | 'json-to-csv' | 'csv-to-json' | 'query-string-parser' | 'query-string-builder' | 'url-parser' | 'csv-delimiter-converter' | 'xml-formatter' | 'html-formatter' | 'css-formatter' | 'generic';
+export type DataMode = 'json-formatter' | 'json-minifier' | 'json-to-csv' | 'csv-to-json' | 'query-string-parser' | 'query-string-builder' | 'url-parser' | 'csv-delimiter-converter' | 'yaml-to-json' | 'json-to-yaml' | 'xml-formatter' | 'html-formatter' | 'css-formatter' | 'generic';
 
-const dataModes = ['json-formatter', 'json-minifier', 'json-to-csv', 'csv-to-json', 'query-string-parser', 'query-string-builder', 'url-parser', 'csv-delimiter-converter', 'xml-formatter', 'html-formatter', 'css-formatter'] as const;
+const dataModes = ['json-formatter', 'json-minifier', 'json-to-csv', 'csv-to-json', 'query-string-parser', 'query-string-builder', 'url-parser', 'csv-delimiter-converter', 'yaml-to-json', 'json-to-yaml', 'xml-formatter', 'html-formatter', 'css-formatter'] as const;
 const delimiterOptions: { label: string; value: Delimiter }[] = [
   { label: 'Comma (,)', value: ',' },
   { label: 'Semicolon (;)', value: ';' },
@@ -48,6 +49,14 @@ export default function DataTool({ component, title, privacyNote }: { component:
         const result = convertCsvDelimiter(input, fromDelimiter, toDelimiter);
         return result.ok ? result.output : result.error;
       }
+      if (mode === 'yaml-to-json') {
+        const result = yamlToJson(input);
+        return result.ok ? result.output : result.error;
+      }
+      if (mode === 'json-to-yaml') {
+        const result = jsonToYaml(input);
+        return result.ok ? result.output : result.error;
+      }
       if (mode === 'xml-formatter') return formatXml(input).output || formatXml(input).error || '';
       if (mode === 'html-formatter') return formatHtml(input).output || formatHtml(input).error || '';
       if (mode === 'css-formatter') return formatCss(input).output || formatCss(input).error || '';
@@ -67,6 +76,8 @@ function sample(mode: DataMode): string {
   if (mode === 'query-string-builder') return 'q=tovolbox\ntag=tools';
   if (mode === 'url-parser') return 'https://example.com/docs/tools?tag=json&tag=seo#top';
   if (mode === 'csv-delimiter-converter') return 'name,role\nAda,Engineer\nLinus,Maintainer';
+  if (mode === 'yaml-to-json') return 'name: Ada\nrole: Engineer\nskills:\n  - JSON\n  - YAML';
+  if (mode === 'json-to-yaml') return '{"name":"Ada","role":"Engineer","skills":["JSON","YAML"]}';
   if (mode === 'xml-formatter') return '<root><item id="1">Hello</item><item id="2" /></root>';
   if (mode === 'html-formatter') return '<article><h1>Hello</h1><p>World<br></p></article>';
   if (mode === 'css-formatter') return 'body{color:#111;margin:0}.card{padding:1rem;border:1px solid #ddd;}';

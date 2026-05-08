@@ -256,6 +256,16 @@ export const tools: Tool[] = [
     ja: { title: 'CSVからJSONへ変換', description: '引用符やカンマを処理しながら、CSV行をJSONオブジェクト配列へ変換します。' },
     ko: { title: 'CSV to JSON 변환기', description: '따옴표와 쉼표를 처리하면서 CSV 행을 JSON 객체 배열로 변환합니다.' },
   }, ['csv', 'json', 'converter']),
+  tool('yaml-to-json', 'json-data-tools', 'text-transform', 'yaml-to-json', {
+    en: { title: 'YAML to JSON Converter', description: 'Convert YAML documents into formatted JSON for configuration and data workflows.' },
+    'zh-CN': { title: 'YAML 转 JSON', description: '将 YAML 文档转换为格式化 JSON，适合配置和数据处理流程。' },
+    'zh-TW': { title: 'YAML 轉 JSON', description: '將 YAML 文件轉換為格式化 JSON，適合設定和資料處理流程。' },
+  }, ['yaml', 'json', 'converter']),
+  tool('json-to-yaml', 'json-data-tools', 'text-transform', 'json-to-yaml', {
+    en: { title: 'JSON to YAML Converter', description: 'Convert JSON values into readable YAML without sending data to a server.' },
+    'zh-CN': { title: 'JSON 转 YAML', description: '将 JSON 值转换为易读 YAML，数据不会发送到服务器。' },
+    'zh-TW': { title: 'JSON 轉 YAML', description: '將 JSON 值轉換為易讀 YAML，資料不會傳送到伺服器。' },
+  }, ['json', 'yaml', 'converter']),
   tool('query-string-parser', 'json-data-tools', 'text-analyze', 'query-string-parser', {
     en: { title: 'Query String Parser', description: 'Parse URL query strings into decoded keys, values, and repeated parameters.' },
     'zh-CN': { title: '查询字符串解析器', description: '将 URL 查询字符串解析为解码后的键、值和重复参数。' },
@@ -442,6 +452,11 @@ export const tools: Tool[] = [
     ja: { title: 'Markdown目次生成ツール', description: '見出しを抽出し、整ったMarkdownの目次を生成します。' },
     ko: { title: 'Markdown 목차 생성기', description: '제목을 추출해 깔끔한 Markdown 목차를 생성합니다.' },
   }, ['markdown', 'toc']),
+  tool('markdown-previewer', 'text-tools', 'text-transform', 'markdown-previewer', {
+    en: { title: 'Markdown Previewer', description: 'Preview common Markdown headings, lists, links, code, and emphasis locally.' },
+    'zh-CN': { title: 'Markdown 预览器', description: '在本地预览常见 Markdown 标题、列表、链接、代码和强调格式。' },
+    'zh-TW': { title: 'Markdown 預覽器', description: '在本機預覽常見 Markdown 標題、清單、連結、程式碼和強調格式。' },
+  }, ['markdown', 'preview', 'html']),
   tool('diff-checker', 'text-tools', 'text-analyze', 'diff-checker', {
     en: { title: 'Diff Checker', description: 'Compare two text blocks line by line and mark additions and removals.' },
     'zh-CN': { title: '文本差异对比工具', description: '逐行比较两段文本，并标记新增和删除内容。' },
